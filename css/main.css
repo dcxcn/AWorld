@@ -1,0 +1,107 @@
+body {
+	margin: 0;
+	background-color: #000;
+	color: #fff;
+	font-family: Monospace;
+	font-size: 13px;
+	line-height: 24px;
+	overscroll-behavior: none;
+}
+
+a {
+	color: #ff0;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+button {
+	cursor: pointer;
+	text-transform: uppercase;
+}
+
+canvas {
+	display: block;
+}
+
+#info {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	text-align: center;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+a, button, input, select {
+	pointer-events: auto;
+}
+
+.dg.ac {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 2 !important; /* TODO Solve this in HTML */
+}
+
+#overlay {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 1;
+	background-color: #000000;
+	color: #ffffff;
+}
+
+#overlay > div {
+	text-align: center;
+}
+
+#overlay > div > button {
+	height: 20px;
+	background: transparent;
+	color: #ffffff;
+	outline: 1px solid #ffffff;
+	border: 0px;
+	cursor: pointer;
+}
+
+#overlay > div > p {
+	color: #777777;
+	font-size: 12px;
+}
+
+.progress {
+	color:red;
+	top:8em;
+	width: 100%;
+	font-size:2em;
+	font-variant:small-caps;
+	font-weight:bold;
+	position:absolute;
+	display: flex;
+	z-index:100;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	text-shadow: #000 0px 0px 10px;
+}
+
+.shadow {-moz-box-shadow: 0px 0px 5px #000;	-webkit-box-shadow: 0px 0px 5px #000;box-shadow: 0px 0px 5px #000;}
+.progressbar { text-align: center; background: white; width: 250px; height: 30px;}
+.bar { background:#d00;	width:50px;	height:30px;}

@@ -1,0 +1,29 @@
+https://babeljs.io/setup#installation
+npm i @babel/core -D
+1¡¢
+npm install --save-dev rollup
+npm install --save-dev rollup-plugin-babel
+npm install --save-dev babel-preset-es2015-rollup
+
+var rollup = require("rollup");
+var babel = require("rollup-plugin-babel");
+
+rollup.rollup({
+  entry: "src/main.js",
+  plugins: [ babel() ]
+}).then(function (bundle) {
+  bundle.write({
+    dest: "dist/bundle.js",
+    format: "umd"
+  });
+});
+
+Create .babelrc configuration file
+
+npm install @babel/preset-env --save-dev
+
+{
+  "presets": ["@babel/preset-env"]
+}
+
+npm install --save-dev rollup-plugin-uglify
