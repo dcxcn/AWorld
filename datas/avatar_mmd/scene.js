@@ -1,6 +1,6 @@
 {
 	ename:window.world.currentSceneName,
-	models:[{
+	models:[/*{
 		name:'cctv_xkn',
 		url:'./assets/models/avatar/mmd/CCTV新科娘/CCTV新科娘.pmx',
 		type:'mmd',
@@ -10,7 +10,7 @@
 		url:'./assets/models/avatar/mmd/miku/miku_v2.pmd',
 		type:'mmd',
 		isSet:false	
-	},{
+	},*/{
 		name:'huowu',
 		url:'./assets/models/avatar/mmd/Mai/Mai.pmx',
 		type:'mmd',
