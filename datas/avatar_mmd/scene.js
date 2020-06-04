@@ -85,10 +85,6 @@
 		url:'./assets/bvhs/holding_idle.bvh',
 		type:'mixamo'
 	},{
-		name:'vmd_idle',
-		url:'./assets/models/avatar/mmd/vmds/test.vmd',
-		type:'vmd'
-	},{
 		name:'vmd_walk',
 		url:'./assets/models/avatar/mmd/vmds/walk/walk.vmd',
 		type:'vmd'
