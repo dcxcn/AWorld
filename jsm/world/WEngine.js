@@ -1,6 +1,6 @@
 /*
- * world.core.js
- * 核心 
+ * WEngine.js
+ * 读取配置控制各个组件 
  */
 import { WEBGL } from '../../jsm/libs/WebGL.js';
 
@@ -3155,7 +3155,7 @@ window.WEngine = (function () {
 				_engine.scene.create();
 			});	
 			
-		});
+		},"min");
 	};
 	return _engine;
 })();

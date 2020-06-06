@@ -18,6 +18,7 @@ import { root, map, REVISION } from '../ammo/physic/root.js';
 *    |___||_| |_| |_|
 *    @author lth / https://github.com/lo-th/
 *    Shoutgun Ammo worker launcher
+*    update by dcxcn
 */
 
 export var physic = ( function () {
