@@ -266,6 +266,9 @@ var WGui = ( function () {
 	function axisHelperVisibility(v){
 		window.WEngine.showAxisHelper(v);
 	}
+	function enableClickMeasure(b){
+		window.WEngine.enableClickMeasure(b);
+	}
 	function showShadow(v){
 		window.WEngine.view.showShadow(v);
 	}
@@ -462,6 +465,7 @@ var WGui = ( function () {
 		ui.add('fps',    { height:30 });
 		ui.add('button', { name:'隐藏', p:70, h:30, r:10 } ).onChange(  function(){ui.hide(true);} );
 		ui.add('bool', { name:'显示坐标轴', p:70, h:20, value:false } ).onChange( function(v){ axisHelperVisibility(v); } );
+		ui.add('bool', { name:'点击测量', p:70, h:20, value:false } ).onChange( function(b){ enableClickMeasure(b); } );
 		ui.add('slide', { name:'24时间轴',min:0, max:24, value:12, step:0.01, precision:2, mode:1 } ).onChange( function(h){ setHour(h); } );
         ui.add('bool', { name:'光源调试', p:70, h:20, value:false } ).onChange( function(v){ switchLightHelper(v); } );
 		ui.add('bool', { name:'显示影子', p:70, h:20, value:true } ).onChange( function(v){ showShadow(v); } );

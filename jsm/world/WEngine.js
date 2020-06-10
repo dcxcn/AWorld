@@ -24,6 +24,7 @@ import { Water } from '../../jsm/three/objects/Water.js';
 import { Water as Water2 } from '../../jsm/three/objects/Water2.js';
 import { PlantTufts } from '../../jsm/threex/objects/PlantTufts.js';
 import { MMDAnimationHelper } from '../../jsm/three/animation/MMDAnimationHelper.js';
+import { CSS2DObject } from '../../jsm/three/renderers/CSS2DRenderer.js';
 import {
 	RollerCoasterGeometry,
 	RollerCoasterShadowGeometry,
@@ -190,6 +191,9 @@ window.WEngine = (function () {
 	var _animationFrameLoop;
 	var perlin = null;
 	var axisHelper = null;
+	var clickMeasureEnabled = false;
+	var sizeGroup = null;
+	var sizeDivs=[];
 	var tmpI=0;
 	var load = 0;
 	var isLoading = false;
@@ -286,6 +290,26 @@ window.WEngine = (function () {
 	};
 	_engine.showAxisHelper = function( v ){
 		if(axisHelper){axisHelper.visible = v;}
+	};
+	_engine.enableClickMeasure = function( b ){
+		if(b==false){
+			if(sizeGroup != null){
+				for(var i=sizeDivs.length-1;i>=0;i--){
+					if(sizeDivs[i].parentNode){
+						sizeDivs[i].parentNode.removeChild(sizeDivs[i]);
+					}
+				}
+				sizeDivs=[];
+				for(var i=0;i<sizeGroup.children.length;i++){
+					sizeGroup.remove(sizeGroup.children[i]);
+				}
+
+				
+				sizeGroup.parent.remove(sizeGroup);
+				sizeGroup = null;
+			}
+		}
+		clickMeasureEnabled = b;
 	};
 	_engine.showPhysicInfo = function(v){
 		showPhyinfo = v;
@@ -2906,6 +2930,7 @@ window.WEngine = (function () {
 			var intersects = raycaster.intersectObjects(_view.objects_raycaster);
 			if (intersects.length > 0) {
 			  _engine.SELECTED = intersects[0].object;
+			  if(clickMeasureEnabled)_engine.showSize(_engine.SELECTED);
 			  if (_engine.eventList != null && _engine.eventList.dbclick != null && _engine.eventList.dbclick.length > 0) {
 				  _engine.eventList.dbclick.forEach( function ( _obj, index) {
 					  if ("string" == typeof (_obj.obj_name)) {
@@ -2965,6 +2990,104 @@ window.WEngine = (function () {
 			}
 
 		});
+	};
+	_engine.showSize = function(model){
+		var box = new THREE.Box3().setFromObject(model);
+		var box3X = box.max.x - box.min.x;
+		var box3Y = box.max.y - box.min.y;
+		var box3Z = box.max.z - box.min.z;
+		var xL = box3X*1.01;
+		var yL = box3Y*1.01;
+		var zL = box3Z*1.01;
+		var geometry = new THREE.BoxGeometry(xL,yL,zL);
+		var material = new THREE.MeshPhongMaterial({
+			color: 0xffffff,
+			transparent: true,
+			opacity: 0.2,
+		});
+		if(sizeGroup != null){
+			for(var i=sizeDivs.length-1;i>=0;i--){
+				if(sizeDivs[i].parentNode){
+					sizeDivs[i].parentNode.removeChild(sizeDivs[i]);
+				}
+			}
+			sizeDivs=[];
+			for(var i=0;i<sizeGroup.children.length;i++){
+				sizeGroup.remove(sizeGroup.children[i]);
+			}
+
+			
+			sizeGroup.parent.remove(sizeGroup);
+			sizeGroup = null;
+		}
+		sizeGroup = new THREE.Group();
+		var mesh = new THREE.Mesh(geometry,material);
+		sizeGroup.add(mesh);
+		var border = new THREE.BoxHelper(mesh,0x0ed5c7);
+		sizeGroup.add(border);
+		
+		var sizeLineX = _engine.makeSizeLine(xL);
+		sizeLineX.position.y = yL / 2 + .5;
+		sizeLineX.position.z = -zL / 2;
+		sizeGroup.add(sizeLineX);		
+		var sizeLineY = _engine.makeSizeLine(yL);
+		sizeLineY.rotateZ(Math.PI / 2);
+		sizeLineY.position.x = xL / 2 + .5;
+		sizeLineY.position.z = -zL / 2;
+		sizeGroup.add(sizeLineY);
+		var sizeLineZ = _engine.makeSizeLine(zL);
+		sizeLineZ.rotateY(Math.PI / 2);
+		sizeLineZ.position.x = xL / 2;
+		sizeLineZ.position.y = -yL / 2 - .5;
+		sizeGroup.add(sizeLineZ);
+		_engine.makeSizeLabel(sizeGroup,box3X,sizeLineX.position);
+		_engine.makeSizeLabel(sizeGroup,box3Y,sizeLineY.position);
+		_engine.makeSizeLabel(sizeGroup,box3Z,sizeLineZ.position);
+		sizeGroup.position.copy(model.position);
+		model.parent.add(sizeGroup);
+	};
+	_engine.makeSizeLine = function(length) {
+		var w = 10;
+		var p10 = new THREE.Vector3(-length / 2,0,0);
+		var p11 = new THREE.Vector3(-length / 2,w / 2,0);
+		var p12 = new THREE.Vector3(-length / 2,-w / 2,0);
+		var p20 = p10.clone().negate();
+		var p21 = p11.clone().negate();
+		var p22 = p12.clone().negate();
+		var LineGroup = new THREE.Group();
+		var lengthLine = createLine([p10, p20]);
+		var leftLine = createLine([p11, p12]);
+		var rightLine = createLine([p21, p22]);
+		var p13 = new THREE.Vector3(-length / 2 + .2,.2,0);
+		var p14 = new THREE.Vector3(-length / 2 + .2,-.2,0);
+		var p23 = p13.clone().negate();
+		var p24 = p14.clone().negate();
+		var leftRowLine = createLine([p13, p10, p14]);
+		var rightRowLine = createLine([p23, p20, p24]);
+		LineGroup.add(lengthLine, leftLine, rightLine, leftRowLine, rightRowLine);
+		return LineGroup;
+		function createLine(pointArr) {
+			var material = new THREE.LineBasicMaterial({
+				color: 0xffffff
+			});
+			var geometry = new THREE.Geometry();
+			geometry.vertices = pointArr;
+			var line = new THREE.Line(geometry,material);
+			return line;
+		}
+	};
+	_engine.makeSizeLabel = function(p,length, pos){			
+		var sizeDiv = document.createElement( 'div' );		
+		sizeDiv.className = 'label';
+		sizeDiv.textContent = length.toFixed(3)+" m" ;
+		sizeDiv.style.color = "#0ed5c7";
+		sizeDiv.style.padding = "5px 10px";
+		sizeDivs.push(sizeDiv);
+		var sizeLabel = new CSS2DObject( sizeDiv );
+		sizeLabel.position.copy(pos);
+		p.add( sizeLabel );
+		return sizeLabel;
+	
 	};
 	_engine.updateCompassAngle = function(){
 		var centerCoords = new THREE.Vector2();

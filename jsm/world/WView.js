@@ -417,6 +417,8 @@ var WView = function(loadingManager) {
 						this.objects_raycaster.push(o.children[i]);
 					}
 				}
+			}else{
+				this.objects_raycaster.push(o);
 			}
 		},
 		removeVisual:function(o){
