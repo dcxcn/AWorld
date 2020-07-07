@@ -18,34 +18,34 @@
 	}],
 	models:[{
 		name:'human1',
-		url:'./assets/models/human1/human1.gltf',
+		url:'./assets/models/avatar/makehuman/human1/human1.gltf',
 		isSet:false	
 	},{
 		name:'human4',
-		url:'./assets/models/human4/model.glb',
+		url:'./assets/models/avatar/makehuman/human4/model.glb',
 		isSet:false	
 	},{
 		name:'human5',
-		url:'./assets/models/human5/human5.gltf',
+		url:'./assets/models/avatar/makehuman/human5/human5.gltf',
 		isSet:false	
 	},{
 		name:'human6',
-		url:'./assets/models/human6/ybot.fbx',
+		url:'./assets/models/avatar/mixamo/ybot.fbx',
 		type:'fbx',
 		isSet:false	
 	},{
 		name:'chr22',
-		url:'./assets/models/human6/chr22.fbx',
+		url:'./assets/models/avatar/mixamo/chr22.fbx',
 		type:'fbx',
 		isSet:false	
 	},{
 		name:'mousey',
-		url:'./assets/models/mousey/chr14.fbx',
+		url:'./assets/models/avatar/mixamo/chr14.fbx',
 		type:'fbx',
 		isSet:false	
 	},{
 		name:'guns',
-		url:'./assets/models/handgun1/model.glb',
+		url:'./assets/models/gun/handgun1.glb',
 		isSet:true
 	}],
 	materials:[{
