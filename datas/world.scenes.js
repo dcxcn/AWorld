@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "avatar_mmd";
+window.world.currentSceneName = "findpath_flatsurface";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'mmd人物模型控制',ename:'avatar_mmd'},

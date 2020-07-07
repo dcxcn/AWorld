@@ -2,11 +2,11 @@
 	ename:window.world.currentSceneName,
 	models:[{
 		name:'human4',
-		url:'./assets/models/human4/model.glb',
+		url:'./assets/models/avatar/makehuman/human4/model.glb',
 		isSet:false	
 	},{
 		name:'houses',
-		url:'./assets/models/houses/houses.glb',
+		url:'./assets/models/scene/houses/houses.glb',
 		type:'gltf',
 		isSet:true	
 	}],
@@ -290,7 +290,7 @@
 		type: 'avatar',
 		ename: 'human4',
 		cname: '老四',
-		position :[3,1,4],
+		position :[-30,1,40],
 		sounds:{
 			data:{
 				addbullet:{name:'addbullet',loop:false,refdistance:2},
