@@ -3,6 +3,7 @@ import {
 	Vector3,
 	Matrix4,
 	Quaternion,
+	Material,
 	AnimationMixer,
 	AnimationClip,
 	AnimationUtils,
@@ -256,11 +257,51 @@ WMMD.prototype.addModel = function( model, options ){
 			//console.log(child.material.alphaTest);						
 		}
 	});
+	function copyMaterialToon2Phong(a,b){	
+		Material.prototype.copy.call( b, a );
+		b.color.copy( a.color );
+
+		b.map = a.map;
+		b.gradientMap = a.gradientMap;
+
+		b.lightMap = a.lightMap;
+		b.lightMapIntensity = a.lightMapIntensity;
+
+		b.aoMap = a.aoMap;
+		b.aoMapIntensity = a.aoMapIntensity;
+
+		b.emissive.copy( a.emissive );
+		b.emissiveMap = a.emissiveMap;
+		b.emissiveIntensity = a.emissiveIntensity;
+
+		b.bumpMap = a.bumpMap;
+		b.bumpScale = a.bumpScale;
+
+		b.normalMap = a.normalMap;
+		b.normalMapType = a.normalMapType;
+		b.normalScale.copy( a.normalScale );
+
+		b.displacementMap = a.displacementMap;
+		b.displacementScale = a.displacementScale;
+		b.displacementBias = a.displacementBias;
+
+		b.alphaMap = a.alphaMap;
+
+		b.wireframe = a.wireframe;
+		b.wireframeLinewidth = a.wireframeLinewidth;
+		b.wireframeLinecap = a.wireframeLinecap;
+		b.wireframeLinejoin = a.wireframeLinejoin;
+
+		b.skinning = a.skinning;
+		b.morphTargets = a.morphTargets;
+		b.morphNormals = a.morphNormals;
+	}
 	function makePhongMaterials( materials ) {
 		var array = [];
 		for ( var i = 0, il = materials.length; i < il; i ++ ) {
 			var m = new THREE.MeshPhongMaterial();
-			m.copy( materials[ i ] );
+			var m2 = materials[ i ];
+			copyMaterialToon2Phong(m2,m);			
 			m.needsUpdate = true;
 			m.envMap = window.WEngine.view.getEnvmap();
 			array.push( m );

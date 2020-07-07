@@ -97,11 +97,8 @@ var WView = function(loadingManager) {
 			_self.cameraControls.screenSpacePanning = true;
 			//_self.cameraControls.enableDamping = true;
 		}
-
-		_self.cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
-		_self.cubeCamera.renderTarget.texture.generateMipmaps = true;
-		_self.cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
-
+		var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+		_self.cubeCamera = new THREE.CubeCamera( 0.1, 1, cubeRenderTarget );
 		_self.scene.background = _self.cubeCamera.renderTarget;
 		//VR
 		/*_self.deviceOrientationControls = new THREE.DeviceOrientationControls(_self.camera, true);
