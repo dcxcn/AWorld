@@ -2,7 +2,7 @@
 	ename:window.world.currentSceneName,
 	models:[{
 		name:'cars',
-		url:'assets/models/cars/cars.glb',
+		url:'assets/models/car/cars.glb',
 		isSet:true	
 	}],
 	materials:[{
