@@ -6,11 +6,7 @@
 		isFollow:true,
 		debug:false
 	}],
-	models:[{
-		name:'buggy',
-		url:'assets/models/buggy/buggy.glb',
-		isSet:true	
-	}],
+	models:[],
 	materials:[{
 			name:'grass',
 			type : 'Phong',
