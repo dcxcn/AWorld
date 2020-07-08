@@ -2,13 +2,13 @@
 	ename:window.world.currentSceneName,
 	materials:[{
 			name:'grass',
-			type : 'phong',
+			type : 'Phong',
 			color: 0xffffff,
 			shininess: 0,
 			specular: 0x000000,
 			opacity: 1,
 			transparent: false,
-			map:{image:'./assets/textures/land/grasslight-small.jpg',wrap:1,repeat:[15,15]},
+			map:{url:'land/grasslight-small.jpg',wrap:1,repeat:[15,15]},
 			combine:THREE.MixOperation
 		}],
 	sounds:[],
