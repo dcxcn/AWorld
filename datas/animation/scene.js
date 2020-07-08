@@ -2,7 +2,7 @@
 	ename:window.world.currentSceneName,
 	models:[{
 		name:'horse',
-		url:'./assets/models/animals/Horse.gltf',
+		url:'./assets/models/animal/Horse.gltf',
 		isSet:false	
 	}],
 	materials:[{
