@@ -492,6 +492,9 @@ var WView = function(loadingManager) {
 			//this.sunLight.castShadow = isShadow;
 			//window.WEngine.updateMaterials();
 		},
+		setCameraFollowBehind:function(b){
+			cameraFollowBehind = b;
+		},
 		getMobile: function () {
 			var n = navigator.userAgent;
 			if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)) return true;

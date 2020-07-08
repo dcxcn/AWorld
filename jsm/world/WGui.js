@@ -247,7 +247,7 @@ var WGui = ( function () {
 	};
 	function heroFollowBehind(b){
 		isFollow = b;
-		window.WEngine.view.cameraFollowBehind = b;
+		window.WEngine.view.setCameraFollowBehind( b );
 	}
 	function helperVisibility(){
 		if(window.WEngine.currentFollow.userData.avatar.helper == null) window.WEngine.currentFollow.userData.avatar.addHelper();
