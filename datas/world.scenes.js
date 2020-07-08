@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "joint_p2p";
+window.world.currentSceneName = "tower";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'人物模型控制',ename:'avatar'},
@@ -25,7 +25,7 @@ window.world.scenes = [
 	{cname:'静竹轩模型测试',ename:'data13'},
 	{cname:'机房',ename:'datacenter_demo1'},
 	{cname:'好多车',ename:'cars'},
-	{cname:'塔',ename:'data16'},
+	{cname:'塔',ename:'tower'},
 	{cname:'绳子',ename:'data17'},
 	{cname:'射线',ename:'ray'},
 	{cname:'组合体',ename:'compound'},
