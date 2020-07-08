@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "avatar";
+window.world.currentSceneName = "rollercoaster";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'人物模型控制',ename:'avatar'},
@@ -11,7 +11,7 @@ window.world.scenes = [
 	{cname:'四面墙',ename:'fourwall'},
 	{cname:'水植被',ename:'terrain_plant_water'},
 	{cname:'高塔路',ename:'data4'},
-	{cname:'过山车',ename:'data5'},
+	{cname:'过山车',ename:'rollercoaster'},
 	{cname:'击碎它',ename:'physic_body_break'},
 	{cname:'物理布',ename:'physic_soft_cloth'},
 	{cname:'软体球',ename:'physic_soft_mesh'},

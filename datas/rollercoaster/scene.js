@@ -2,7 +2,7 @@
 	ename:window.world.currentSceneName,
 	models:[{
 		name:'human4',
-		url:'./assets/models/human4/human4.glb',
+		url:'./assets/models/avatar/makehuman/human4/model.glb',
 		isSet:false	
 	}],
 	materials:[],
@@ -96,35 +96,35 @@
 		onTerrainObjects:[{
 			type: 'plant',
 			name: 'grass01',
-			image: 'grass01.png',
+			image: 'plant/grass01.png',
 			size:[0.1,0.1],
 			randompos:{max:[-16,16,-16,16],min:[-10,10,-10,10]},
 			tuft: 1600			
 		},{
 			type: 'plant',
 			name: 'grass02',
-			image: 'grass02.png',
+			image: 'plant/grass02.png',
 			size:[0.2,0.2],
 			randompos:{max:[-16,16,-16,16],min:[-10,10,-10,10]},
 			tuft: 3000			
 		},{
 			type: 'plant',
 			name: 'flowers01',
-			image: 'flowers01.png',
+			image: 'plant/flowers01.png',
 			size:[0.3,0.3],
 			randompos:{max:[-16,16,-16,16],min:[-10,10,-10,10]},
 			tuft: 300			
 		},{
 			type: 'plant',
 			name: 'flowers02',
-			image: 'flowers02.png',
+			image: 'plant/flowers02.png',
 			size:[0.5,0.5],
 			randompos:{max:[-16,16,-16,16],min:[-10,10,-10,10]},
 			tuft: 100			
 		},{
 			type: 'plant',
 			name: 'tree01',
-			image: 'tree01.png',
+			image: 'plant/tree01.png',
 			size:[3,3],		
 			positions: [[-2, -0.15, -2],[-4, -0.15, -4],
 			[-2, -0.15, 2],[-4, -0.15, 4],
@@ -155,7 +155,7 @@
 		type: 'avatar',
 		ename: 'human4',
 		cname: '老四',
-		position :[3,1,4],
+		position :[3,2,4],
 		sounds:{
 			data:{
 				addbullet:{name:'addbullet',loop:false,refdistance:2},
