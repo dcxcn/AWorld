@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "rollercoaster2";
+window.world.currentSceneName = "buggy";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'人物模型控制',ename:'avatar'},
@@ -10,7 +10,7 @@ window.world.scenes = [
 	{cname:'地形颜色',ename:'terrainc'},
 	{cname:'四面墙',ename:'fourwall'},
 	{cname:'水植被',ename:'terrain_plant_water'},
-	{cname:'高塔路',ename:'data4'},
+	{cname:'高塔路',ename:'rollercoaster2'},
 	{cname:'过山车',ename:'rollercoaster'},
 	{cname:'击碎它',ename:'physic_body_break'},
 	{cname:'物理布',ename:'physic_soft_cloth'},
@@ -19,8 +19,8 @@ window.world.scenes = [
 	{cname:'弹簧关节',ename:'joint_spring_dof'},
 	{cname:'车基本体',ename:'car_basic'},
 	{cname:'摩托车体',ename:'moto_basic'},
-	{cname:'开汽车',ename:'data10'},
-	{cname:'寻路者',ename:'data11'},
+	{cname:'开汽车',ename:'buggy'},
+	{cname:'寻路者',ename:'findpath_flatsurface'},
 	{cname:'地形寻路',ename:'findpath_terrain'},
 	{cname:'静竹轩模型测试',ename:'data13'},
 	{cname:'机房',ename:'datacenter_demo1'},

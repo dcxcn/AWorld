@@ -8,7 +8,7 @@
 	}],
 	models:[{
 		name:'buggy',
-		url:'assets/models/buggy/buggy.glb',
+		url:'assets/models/car/buggy.glb',
 		isSet:true	
 	}],
 	materials:[{
