@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "ray";
+window.world.currentSceneName = "joint_p2p";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'人物模型控制',ename:'avatar'},
@@ -29,6 +29,6 @@ window.world.scenes = [
 	{cname:'绳子',ename:'data17'},
 	{cname:'射线',ename:'ray'},
 	{cname:'组合体',ename:'compound'},
-	{cname:'关节点对点',ename:'data20'},
+	{cname:'关节点对点',ename:'joint_p2p'},
 	{cname:'迷宫',ename:'maze'},
 	{cname:'街道',ename:'street'}];
