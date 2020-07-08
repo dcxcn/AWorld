@@ -2,7 +2,7 @@
 	ename:window.world.currentSceneName,
 	models:[{
 		name:'human4',
-		url:'./assets/models/human4/model.glb',
+		url:'./assets/models/avatar/makehuman/human4/model.glb',
 		isSet:false	
 	}],
 	materials:[],
@@ -153,7 +153,7 @@
 		type: 'avatar',
 		ename: 'human4',
 		cname: '老四',
-		position :[3,1,4],
+		position :[3,2,4],
 		sounds:{
 			data:{
 				addbullet:{name:'addbullet',loop:false,refdistance:2},

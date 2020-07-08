@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "rollercoaster";
+window.world.currentSceneName = "rollercoaster2";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'人物模型控制',ename:'avatar'},
