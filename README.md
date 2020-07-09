@@ -7,6 +7,10 @@ avatar
 avatar support gltf、fbx see config datas\avatar
 avatar_mmd support mmd     see config  datas\avatar_mmd
 
+terrain
+--------------------------------------------------------
+terrainc
+terrain_plant_water
 
 physic
 --------------------------------------------------------
