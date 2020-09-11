@@ -286,7 +286,8 @@ var WGui = ( function () {
 
     gui.update = function(){
         ui.update();	
-    }
+	}
+	
 	var progressC,progressbar,bar,message;
     gui.init = function(){      
 
@@ -381,9 +382,22 @@ var WGui = ( function () {
 
     gui.resize = function( w ){
 
-       
-
-    };
+	};
+	var debugTempGroups=[];
+	gui.addDebugTempGroup = function(name, debugParams){		
+		var g = ui.add('group', { name:name, bg:'rgba(120,100,80,0.8)' });
+		for(var i=0;i<debugParams.length;i++){
+			var dpO = debugParams[i];
+			g.add('slide', { name:dpO.name,min:dpO.min, max:dpO.max, value:dpO.value, step:0.01, precision:2, mode:1 } ).onChange( dpO.f );
+		}
+		debugTempGroups.push(g);
+	};
+	gui.removeDebugTempGroups = function(){
+		for(var i=0;i<debugTempGroups.length;i++){
+			ui.remove(debugTempGroups[i]);
+		}
+		debugTempGroups=[];
+	};
 	gui.icon = function ( type, color, w, ww ){
 
         w = w || 40;
@@ -614,6 +628,7 @@ var WGui = ( function () {
 	gui.reset = function(){
 		this.removeJoystick();
 		this.clearBtns();
+		this.removeDebugTempGroups();
 	};
 	
 	gui.addControl = function(c,user){

@@ -2607,11 +2607,19 @@ window.WEngine = (function () {
 					while(i--){
 						pAry.push(new Promise(function(resolve, reject){
 							var mo = curScene.materials[i];
+							var mo_type = mo.type;
+							var mo_name = mo.name;
+							var mo_loop = mo.loop;
+							var mo_debugParams = mo.debugParams;							
 							_view.material(mo);
-							if(mo.loop){
-								_engine.scene.loopFunctions.push(mo.loop);
-							}	
-							resolve('load materials ok');
+							if(mo_loop){
+								_engine.scene.loopFunctions.push(mo_loop);
+							}
+							if(mo_type == "shader" && mo_debugParams){
+								//展示shader 调试组
+								_gui.addDebugTempGroup("着色器-"+mo_name,mo_debugParams);
+							}
+							 resolve('load materials ok');
 						}));							
 					}
 				}

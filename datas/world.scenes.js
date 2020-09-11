@@ -1,5 +1,5 @@
 window.world = window.world || {};
-window.world.currentSceneName = "material_shader1";
+window.world.currentSceneName = "physic_body_break";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'Shader测试1',ename:'material_shader1'},

@@ -717,12 +717,15 @@ var WView = function(loadingManager) {
 			return WMaterials.get( name );
 
 		},
+
 		getShaderUnforms: function( name ){
 			return WMaterials.getShaderUnforms(name);
 		},
+
 		updateEnvmap:function(){
 			WMaterials.updateEnvmap(this.envMap);
 		},
+		
 		setEnvMapRenderTarget:function(renderTarget){
 			this.envMapRenderTarget = renderTarget;
 			this.cubeCamera.update( this.renderer, this.envMapRenderTarget );
