@@ -137,8 +137,6 @@ window.WEngine = (function () {
 		showDebugPanel : function(v){_engine.gui.showDebugPanel(v)},
 		follow : function(objName){
 			this.currentFollow = _engine.byName(objName);
-			//_physic.move(objName);
-			//if(window.AudioContext || window.webkitAudioContext)this.currentFollow.add(_engine.player.listener);
 		},
 		createRandomColor : function() {return Math.floor( Math.random() * ( 1 << 24 ) );},
 		toRad : function ( r ) {var i = r.length;while(i--) r[i] *= Math.torad;return r;},
@@ -2828,12 +2826,12 @@ window.WEngine = (function () {
 		if(mesh.userData.hasOwnProperty('audios') && mesh.userData.audios.hasOwnProperty(sName)){
 			var audio = mesh.userData.audios[sName];
 			//console.log('sName=='+sName);
-			//if(!audio.isPlaying)audio.play();
+			if(!audio.isPlaying)audio.play();
 		}
 	};
 	_engine.stopPlaySound = function(mesh,sName){		
 		if(mesh.userData.hasOwnProperty('audios') && mesh.userData.audios.hasOwnProperty(sName)){
-			//mesh.userData.audios[sName].stop();
+			mesh.userData.audios[sName].stop();
 		}
 	};
 
@@ -2852,7 +2850,7 @@ window.WEngine = (function () {
 			//ball.receiveShadow = true;
 			//加声音
 			//
-			//_engine.addSound(_engine.player.listener,ball,fireSound);
+			//_engine.addSound(_view.audioListener,ball,fireSound);
 			//ball.userData = ball.userData||{};
 			//ball.userData.damage = 10;
 			//ball.userData.damageUUID = Math.generateUUID();
@@ -2869,7 +2867,7 @@ window.WEngine = (function () {
 				linearVelocity:[ throwDir.x, throwDir.y, throwDir.z]
 			});
 			var fireSound={data:{fire:{name:'gun01',loop:false,refdistance:2}}};
-			_engine.addSound(_engine.player.listener,ball,fireSound);
+			_engine.addSound(_view.audioListener,ball,fireSound);
 			//var ballBody = _physic.createRigidBody( ball, ballShape, ballMass, throwPos, quat ,null, null, null, 2);
 			//ballBody.setLinearVelocity( new Ammo.btVector3( throwDir.x, throwDir.y, throwDir.z ) );
 			_engine.playSound(ball,'fire');
