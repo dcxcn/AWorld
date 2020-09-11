@@ -48,13 +48,10 @@ Heroe.prototype = {
 		   window.WEngine.options({
 			   name:this.mesh.name,
 			   type:'character',
-			   angle:angle			   
+               angle:angle,
+               pos:[this.entity.position.x,this.mesh.position.y,this.entity.position.y]			   
 		   },true);
-		   window.WEngine.options({
-			   name:this.mesh.name,
-			   type:'character',
-			   pos:[this.entity.position.x,this.mesh.position.y,this.entity.position.y]			   
-		   },true);
+
 		   this.mesh.userData.findPath = true;
 		   this.mesh.userData.avatar.playAction(this.mesh.userData.actionName||"run");
 		}

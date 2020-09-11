@@ -377,17 +377,17 @@ Object.assign( Hero.prototype, {
 		}
 		//add by dcx
 		if(o.pos !== undefined ){
-			this.setMatrix(o);
+			this.setPosition(o);
 		}
 	},
 
-	setMatrix: function ( o ){
+	setPosition: function ( o ){
 
 		var p0 = math.vector3();
 		o.pos = math.vectomult( o.pos, root.invScale );
-		p0.fromArray( o.pos )
+		p0.fromArray( o.pos );
 
-		this.controller.warp( p0 );
+		this.controller.getGhostObject().getWorldTransform().setOrigin(p0);
 
 		p0.free();
 
