@@ -3,6 +3,7 @@ import { WTextures } from '../../jsm/world/WTextures.js';
 var WMaterials = ( function () {
 
 var data = new Map();
+var shaderUniforms = new Map();
 var wire = false;
 var shadowSide = false;
 data.set( 'basic', new THREE.MeshBasicMaterial({ color:0xffffff, name:'basic', wireframe:wire }));				
@@ -65,7 +66,9 @@ var materials = {
         return data.has( name ) ? data.get( name ) : null;
 
     },
-
+    getShaderUnforms: function(name){     
+        return shaderUniforms.has( name ) ? shaderUniforms.get( name ) : null;
+    },
    /* clearOne: function ( name ){
 
         var ref = materials.get( name );
@@ -261,8 +264,15 @@ var materials = {
         }
 		console.log('type==='+type);
 		// create three material
-		var mat;
-		if(type == 'Line'){
+        var mat;
+        if(type == 'shader'){    
+            shaderUniforms.set(o.name, o.uniforms);       
+            mat =  new THREE.ShaderMaterial({
+                uniforms: o.uniforms,
+                vertexShader: o.vertexShader,
+                fragmentShader: o.fragmentShader
+            });           
+        }else if(type == 'Line'){
 			mat = data[name] ? data[name] : new THREE.LineBasicMaterial( o );
 		}else{			  
 			mat = data[name] ? data[name] : new THREE[ 'Mesh' + type + 'Material' ]( o );

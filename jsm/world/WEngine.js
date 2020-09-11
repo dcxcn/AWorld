@@ -2516,6 +2516,9 @@ window.WEngine = (function () {
 		if(curO.scale) mesh.scale.fromArray( curO.scale);
 		_view.addVisual( mesh );
 	};
+	_engine.getShaderUnforms = function( name ){
+		return _view.getShaderUnforms(name);
+	};
 	_engine.loadSceneFile = function(sceneName,callback){
 		var url = './datas/'+sceneName+'/scene.js';
 		fileLoader.load(url,function(data){
@@ -2603,7 +2606,11 @@ window.WEngine = (function () {
 					var i=curScene.materials.length;
 					while(i--){
 						pAry.push(new Promise(function(resolve, reject){
-							_view.material(curScene.materials[i]);
+							var mo = curScene.materials[i];
+							_view.material(mo);
+							if(mo.loop){
+								_engine.scene.loopFunctions.push(mo.loop);
+							}	
 							resolve('load materials ok');
 						}));							
 					}
