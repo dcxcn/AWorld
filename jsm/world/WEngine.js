@@ -2516,6 +2516,41 @@ window.WEngine = (function () {
 		if(curO.scale) mesh.scale.fromArray( curO.scale);
 		_view.addVisual( mesh );
 	};
+	_engine.loadGlsl_vs = function(mo,callBack){
+		var url = './datas/'+window.world.currentSceneName+'/'+mo.vertexShaderSrc;
+		fileLoader.load(url,function(data){
+			mo.vertexShader = data;
+			callBack();
+		});
+	};
+	_engine.loadGlsl_fs = function(mo,callBack){
+		var url = './datas/'+window.world.currentSceneName+'/'+mo.fragmentShaderSrc;
+		fileLoader.load(url,function(data){
+			mo.fragmentShader = data;
+			callBack(mo.name);
+		});
+	};
+	_engine.preLoadGlslFiles = function(mo,callBack){
+		var pAry=[];
+		if(mo.vertexShaderSrc){
+			pAry.push(new Promise(function(resolve, reject){
+				_engine.loadGlsl_vs(mo,function(name){					
+					resolve('load '+name+' shader vs ok');
+				});
+			}));
+		}
+		if(mo.fragmentShaderSrc){
+			pAry.push(new Promise(function(resolve, reject){
+				_engine.loadGlsl_fs(mo,function(name){					
+					resolve('load '+name+' shader fs  ok');
+				});
+			}));
+		}
+		
+		Promise.all(pAry).then(function(){
+			callBack();
+		});
+	};
 	_engine.getShaderUnforms = function( name ){
 		return _view.getShaderUnforms(name);
 	};
@@ -2610,16 +2645,20 @@ window.WEngine = (function () {
 							var mo_type = mo.type;
 							var mo_name = mo.name;
 							var mo_loop = mo.loop;
-							var mo_debugParams = mo.debugParams;							
-							_view.material(mo);
-							if(mo_loop){
-								_engine.scene.loopFunctions.push(mo_loop);
-							}
-							if(mo_type == "shader" && mo_debugParams){
-								//展示shader 调试组
-								_gui.addDebugTempGroup("着色器-"+mo_name,mo_debugParams);
-							}
-							 resolve('load materials ok');
+							var mo_debugParams = mo.debugParams;
+							_engine.preLoadGlslFiles(mo,function(){
+								_view.material(mo);
+								if(mo_loop){
+									_engine.scene.loopFunctions.push(mo_loop);
+								}
+								if(mo_type == "shader" && mo_debugParams){
+									//展示shader 调试组
+									_gui.addDebugTempGroup("着色器-"+mo_name,mo_debugParams);
+								}
+								 resolve('load materials ok');
+							});
+							
+							
 						}));							
 					}
 				}

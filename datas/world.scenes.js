@@ -1,8 +1,9 @@
 window.world = window.world || {};
-window.world.currentSceneName = "physic_body_break";
+window.world.currentSceneName = "material_shader2";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
 	{cname:'Shader测试1',ename:'material_shader1'},
+	{cname:'Glsl文件测试1',ename:'material_shader2'},
 	{cname:'人物模型控制',ename:'avatar'},
 	{cname:'mmd人物模型控制',ename:'avatar_mmd'},
 	{cname:'mmd动画',ename:'mmd'},
