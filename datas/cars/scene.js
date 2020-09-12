@@ -109,8 +109,8 @@
 		}
 	},*/{
 		type: 'car',
-		conFunc:function(pWEngine){
-			var _view = pWEngine.view;
+		conFunc:function(){
+			var _view = WEngine.view;
 			var cars = [
 				{ n:'001', name:'fordM'  , radius:0.36, nw:4, w:'1', mass:1109,  wPos:[0.76, 0, 1.46] },
 				{ n:'002', name:'vaz'    , radius:0.36, nw:4, w:'1', mass:1003,  wPos:[0.72, 0, 1.31] },

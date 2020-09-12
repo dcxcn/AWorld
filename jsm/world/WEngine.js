@@ -1613,7 +1613,7 @@ window.WEngine = (function () {
 	};
 	_engine.create_box = _engine.create_hardbox  = function(curO){
 		if(curO.hasOwnProperty("conFunc")){
-			var confs = curO.conFunc(_engine);
+			var confs = curO.conFunc();
 			for(var i=0,il=confs.length; i<il; i++){								
 				_engine.add(confs[i]);
 			}
@@ -2198,7 +2198,11 @@ window.WEngine = (function () {
 				} );					
 				_view.addVisual(gsmesh);
 				break;
+			case 'custom':
+				curConf.customFunc(terrainPos,terrainData);
+				break;
 			}
+
 		}	
 	};
 	_engine.switchLightHelper = function(v){

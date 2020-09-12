@@ -118,8 +118,8 @@
 		}
 	},{
 		type: 'car',
-		conFunc: function(pWEngine){
-			var _view = pWEngine.view;
+		conFunc: function(){
+			var _view = WEngine.view;
 			var cars = [
 				{ n:'001', name:'buggy', radius:0.43, deep:0.3, mass:1300, massCenter:[0,0,0],  wPos:[ 0.838, 0.43, 1.37 ], rot:[0,0,0], size:[ 1.5, 0.4, 3.6 ] }
 			];
