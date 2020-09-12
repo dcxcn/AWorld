@@ -1,7 +1,8 @@
 window.world = window.world || {};
-window.world.currentSceneName = "material_shader2";
+window.world.currentSceneName = "customgeo_grass";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
+	{cname:'自定义Geometry测试',ename:'customgeo_grass'},
 	{cname:'Shader测试1',ename:'material_shader1'},
 	{cname:'Glsl文件测试1',ename:'material_shader2'},
 	{cname:'人物模型控制',ename:'avatar'},

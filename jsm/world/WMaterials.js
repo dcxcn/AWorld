@@ -271,7 +271,14 @@ var materials = {
                 uniforms: o.uniforms,
                 vertexShader: o.vertexShader,
                 fragmentShader: o.fragmentShader
-            });           
+            });
+        }else if(type == 'RawShader'){
+            shaderUniforms.set(o.name, o.uniforms);       
+            mat =  new THREE.RawShaderMaterial({
+                uniforms: o.uniforms,
+                vertexShader: o.vertexShader,
+                fragmentShader: o.fragmentShader
+            });
         }else if(type == 'Line'){
 			mat = data[name] ? data[name] : new THREE.LineBasicMaterial( o );
 		}else{			  
