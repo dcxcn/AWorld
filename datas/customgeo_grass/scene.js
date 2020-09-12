@@ -39,7 +39,7 @@
 	objects: [{		
 		type: 'custom',
 		name: 'grassLand',
-		customFunc:function(pWEngine){
+		customFunc:function(){
 			function getYPosition(x, z) {
 				
 				return 1;
@@ -150,9 +150,9 @@
 			instanced_geometry.setAttribute('stretch', stretchAttribute);
 			instanced_geometry.setAttribute('halfRootAngleSin', halfRootAngleSinAttribute);
 			instanced_geometry.setAttribute('halfRootAngleCos', halfRootAngleCosAttribute);
-			var mat = pWEngine.view.getMaterial("rs_grass");
+			var mat = WEngine.view.getMaterial("rs_grass");
 			var mesh = new THREE.Mesh(instanced_geometry, mat);
-			pWEngine.view.addVisual(mesh);		
+			WEngine.view.addVisual(mesh);		
 
 		}
 		

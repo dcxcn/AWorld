@@ -331,8 +331,8 @@
 		scale:[10,10,10]
 	},*/{
 		type: 'car',
-		conFunc: function(pWEngine){
-			var _view = pWEngine.view;
+		conFunc: function(){
+			var _view = WEngine.view;
 			var cars = [
 				{ n:'001', name:'basicMoto',pos:[1,5,0], radius:0.43, deep:0.3, mass:600, massCenter:[0,-0.6,0],  wPos:[ 0.1, -0.02, 1.1 ], rot:[0,-90,0], size:[ 0.6, 0.5, 2 ] }
 			];

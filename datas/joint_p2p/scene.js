@@ -75,9 +75,9 @@
 		restitution:0.5 
 	},{
 		type: 'custom',
-		customFunc: function(pWEngine){
-			var _view = pWEngine.view;
-			var _physic = pWEngine.physic;
+		customFunc: function(){
+			var _view = WEngine.view;
+			var _physic = WEngine.physic;
 			var mat = _view.material({ name:'mobil',
 				color:0xcbad7b,
 				roughness: 0.4,

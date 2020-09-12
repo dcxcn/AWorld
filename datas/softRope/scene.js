@@ -30,9 +30,9 @@
 		texture:{url:'sprites/compass.png'}
 	},{
 		type: 'custom',
-		customFunc: function(pWEngine){
-			var _view = pWEngine.view;
-			var _physic = pWEngine.physic;
+		customFunc: function(){
+			var _view = WEngine.view;
+			var _physic = WEngine.physic;
 			var glass = _view.material({
 				name:'glass',
 				color: 0x3366ff,
@@ -50,7 +50,7 @@
 
 				z = -20 + i*2;
 
-				pWEngine.add({ 
+				WEngine.add({ 
 					type:'softRope',
 					material:glass,
 					name:'rope'+i, 
@@ -71,7 +71,7 @@
 
 			var i = 10;
 			while(i--){
-				pWEngine.add({ type:'sphere',material:glass, size:[Math.rand(2,4)], pos:[Math.rand(-30,30), 30+(i*3), Math.rand(-10,10)], mass:0.2});
+				WEngine.add({ type:'sphere',material:glass, size:[Math.rand(2,4)], pos:[Math.rand(-30,30), 30+(i*3), Math.rand(-10,10)], mass:0.2});
 			}
 
 			_physic.postUpdate =function () {

@@ -1257,7 +1257,7 @@ window.WEngine = (function () {
 	//创建区域开始
 	//=====================================================
 	_engine.create_custom = function(curO){
-		curO.customFunc(_engine);
+		curO.customFunc();
 	};
 	_engine.create_superSky = function(curO){
 		var sky;

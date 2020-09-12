@@ -36,8 +36,8 @@
 		friction:0.5 
 	},{
 		type: 'custom',
-		customFunc: function(pWEngine){
-			var _physic = pWEngine.physic;
+		customFunc: function(){
+			var _physic = WEngine.physic;
 			var num = 20;
 			var mid = (num * 2.1) * 0.5;
 			var py = 20;

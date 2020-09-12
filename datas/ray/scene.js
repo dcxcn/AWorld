@@ -78,9 +78,9 @@
 		friction:0.5 
 	},{
 		type: 'custom',
-		customFunc: function(pWEngine){
-			var _view = pWEngine.view;
-			var _physic = pWEngine.physic;
+		customFunc: function(){
+			var _view = WEngine.view;
+			var _physic = WEngine.physic;
 			var ballMat = _view.material({
 				name:'bball',
 				roughness: 0.4,
@@ -89,7 +89,7 @@
 				normalMap: { url: 'bball/bball_n.jpg', repeat:[2,1], flip:false },
 			});
 			
-			var ball = pWEngine.add({ type:'highsphere', name:'ball', size:[5], pos:[0,10,-25], mass:2, friction:0.5, material:ballMat });
+			var ball = WEngine.add({ type:'highsphere', name:'ball', size:[5], pos:[0,10,-25], mass:2, friction:0.5, material:ballMat });
 
 			var i = 20;
 			while(i--){
