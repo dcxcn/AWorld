@@ -3,7 +3,7 @@
 	models:[],
 	materials:[{
 		name:'custom1',
-		type : 'shader',
+		type : 'Shader',
 		uniforms:{time: { value: 1.0 }},
 		vertexShader:"varying vec2 vUv; "+
         "void main()"+

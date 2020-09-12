@@ -3,7 +3,7 @@
 	models:[],
 	materials:[{
 		name:'custom1',
-		type : 'shader',
+		type : 'Shader',
 		uniforms:{time: { value: 1.0 }},
 		vertexShaderSrc:"vs.glsl",
 		fragmentShaderSrc:"fs.glsl",

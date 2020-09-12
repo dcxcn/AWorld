@@ -265,7 +265,7 @@ var materials = {
 		console.log('type==='+type);
 		// create three material
         var mat;
-        if(type == 'shader'){    
+        if(type == 'Shader'){
             shaderUniforms.set(o.name, o.uniforms);       
             mat =  new THREE.ShaderMaterial({
                 uniforms: o.uniforms,

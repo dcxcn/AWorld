@@ -2651,7 +2651,7 @@ window.WEngine = (function () {
 								if(mo_loop){
 									_engine.scene.loopFunctions.push(mo_loop);
 								}
-								if(mo_type == "shader" && mo_debugParams){
+								if(mo_type == "Shader" && mo_debugParams){
 									//展示shader 调试组
 									_gui.addDebugTempGroup("着色器-"+mo_name,mo_debugParams);
 								}
