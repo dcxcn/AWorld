@@ -551,25 +551,30 @@ window.WEngine = (function () {
 	  //position: { x:,y:,z:},
 	  //rotation: { x:,y:,z:},
 	  //}
+	  var tmMat = null;
+	  if(_obj.material){
+			tmMat = _view.getMaterial(_obj.material);
+	  }else{
+		if (typeof _obj.pic == "string") {//传入的材质是图片路径，使用 textureloader加载图片作为材质
+			var texture = WTextures.make({url:_obj.pic,name:_obj.name});
+		} else {
+			var texture = new THREE.CanvasTexture(_obj.pic)
+		}
+		var MaterParam = {//材质的参数
+			map: texture,		 
+			side: THREE.FrontSide,
+			//blending: THREE.AdditiveBlending,
+			transparent: _obj.transparent,
+			//needsUpdate:true,
+			//premultipliedAlpha: true,
+			opacity: _obj.opacity
+		}
+		if (_obj.blending) {
+			MaterParam.blending = THREE.AdditiveBlending//使用饱和度叠加渲染
+		}
+		tmMat = new THREE.MeshBasicMaterial(MaterParam);
+	  }
 
-	  if (typeof _obj.pic == "string") {//传入的材质是图片路径，使用 textureloader加载图片作为材质
-		  var texture = WTextures.make({url:_obj.pic,name:_obj.name});
-	  } else {
-		  var texture = new THREE.CanvasTexture(_obj.pic)
-	  }
-	  var MaterParam = {//材质的参数
-		  map: texture,		 
-		  side: THREE.FrontSide,
-		  //blending: THREE.AdditiveBlending,
-		  transparent: _obj.transparent,
-		  //needsUpdate:true,
-		  //premultipliedAlpha: true,
-		  opacity: _obj.opacity
-	  }
-	  if (_obj.blending) {
-		  MaterParam.blending = THREE.AdditiveBlending//使用饱和度叠加渲染
-	  }
-	  var tmMat = new THREE.MeshBasicMaterial(MaterParam);
 
 	  var plane = new THREE.Mesh(new THREE.PlaneGeometry(_obj.width, _obj.height, 1, 1),tmMat);
 	  plane.position.x = _obj.position.x;
@@ -710,7 +715,7 @@ window.WEngine = (function () {
 	  var _height = _obj.size[1] || 10;
 	  var _x = _obj.position[0] || 0, _y = _obj.position[1] || 0, _z = _obj.position[2] || 0;
 	  var skinColor = _obj.style.skinColor || 0x98750f;
-	  var cubeGeometry = new THREE.CubeGeometry(_width, _height, _depth, 0, 0, 1);
+	  var cubeGeometry = new THREE.BoxGeometry(_width, _height, _depth, 1, 1, 1);
 
 	  //六面颜色
 	  for (var i = 0; i < cubeGeometry.faces.length; i += 2) {
