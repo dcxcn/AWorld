@@ -284,7 +284,7 @@ var materials = {
 		}else{			  
 			mat = data[name] ? data[name] : new THREE[ 'Mesh' + type + 'Material' ]( o );
 		}
-      
+        mat.side = o.side;
 
         //mat.lights = withLight;
         

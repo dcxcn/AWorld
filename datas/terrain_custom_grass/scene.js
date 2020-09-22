@@ -40,10 +40,10 @@
 			var uniforms1 = WEngine.getShaderUnforms("rs_grass1");
 			uniforms1.time.value += 1 / 100;
 		},
-		debugParams:[{name:"time",min:0,max:10,value:5,f:function(val){
+		debugParams:[{name:"time",min:0,max:10,step:0.01,value:5,f:function(val){
 			var uniforms1 = WEngine.getShaderUnforms("rs_grass1");
 			uniforms1.time.value = val;
-		}},{name:"blade_h",min:0.1,max:3,value:1,f:function(val){
+		}},{name:"blade_h",min:0.1,max:3,step:0.1,value:1,f:function(val){
 			var uniforms1 = WEngine.getShaderUnforms("rs_grass1");
 			uniforms1.blade_h.value = val;
 		}}

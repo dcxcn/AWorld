@@ -388,7 +388,7 @@ var WGui = ( function () {
 		var g = ui.add('group', { name:name, bg:'rgba(120,100,80,0.8)' });
 		for(var i=0;i<debugParams.length;i++){
 			var dpO = debugParams[i];
-			g.add('slide', { name:dpO.name,min:dpO.min, max:dpO.max, value:dpO.value, step:0.01, precision:2, mode:1 } ).onChange( dpO.f );
+			g.add('slide', { name:dpO.name,min:dpO.min, max:dpO.max, value:dpO.value, step:dpO.step, precision:2, mode:1 } ).onChange( dpO.f );
 		}
 		debugTempGroups.push(g);
 	};

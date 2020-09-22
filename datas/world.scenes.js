@@ -1,8 +1,8 @@
 window.world = window.world || {};
-window.world.currentSceneName = "datacenter_demo1";
+window.world.currentSceneName = "shader_wavecolor1";
 window.world.scenes = window.world.scenes || {};
 window.world.scenes = [
-	{cname:'光柱测试1',ename:'shader_guangzhu1'},
+	{cname:'波动线测试1',ename:'shader_wavecolor1'},
 	{cname:'地形自定义草皮测试',ename:'terrain_custom_grass'},
 	{cname:'自定义Geometry测试',ename:'customgeo_grass'},
 	{cname:'Shader测试1',ename:'material_shader1'},
