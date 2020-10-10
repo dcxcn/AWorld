@@ -17,7 +17,6 @@ import { BufferGeometryUtils } from '../../jsm/three/utils/BufferGeometryUtils.j
 import { TerrainData } from '../../jsm/threex/math/TerrainData.js';
 import { SimplexNoise } from '../../jsm/three/math/SimplexNoise.js';
 import { ShaderExtras } from '../../jsm/threex/shaders/ShaderExtras.js';
-import { SuperSky } from '../../jsm/threex/objects/SuperSky.js';
 import { Sky } from '../../jsm/three/objects/Sky.js';
 import { Terrain } from '../../jsm/threex/objects/Terrain.js';
 import { Water } from '../../jsm/three/objects/Water.js';

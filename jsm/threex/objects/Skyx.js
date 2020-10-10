@@ -28,8 +28,6 @@ import {
 	AdditiveBlending,
 	Sprite,
 	DirectionalLight,
-	OrthographicCamera,
-	LightShadow,
 	HemisphereLight,
 	Spherical,
 	Vector3,
@@ -119,9 +117,13 @@ Skyx.prototype = Object.assign(Object.create( Mesh.prototype) ,{
 		this.sun = new DirectionalLight( 0xffffff, 0.8);
 		this.sun.add( sunSprite );
 
-    	var dd = 20;
-    	var camShadow = new OrthographicCamera( dd, -dd, dd, -dd,  900, 1200 );
-        this.sun.shadow = new LightShadow( camShadow );
+		var d = 20;
+		this.sun.shadow.camera.left = - d;
+		this.sun.shadow.camera.right = d;
+		this.sun.shadow.camera.top = d;
+		this.sun.shadow.camera.bottom = - d;
+		this.sun.shadow.camera.near = 900;
+		this.sun.shadow.camera.far = 1200;
 
         this.sun.shadow.mapSize.width = 512;
         this.sun.shadow.mapSize.height = 512;
