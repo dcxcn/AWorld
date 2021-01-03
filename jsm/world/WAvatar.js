@@ -564,7 +564,7 @@ WAvatar.prototype.getAnimationClip=function ( model, bvhData, tPose, seq ) {
 
 	var times, positions, resultPositions, rotations, resultRotations, pos, rot;
 
-	var matrixWorldInv = new Matrix4().getInverse( model.matrixWorld );
+	var matrixWorldInv = new Matrix4().copy( model.matrixWorld ).invert();
 
 	var globalQuat = new Quaternion();
 	var globalPos = new Vector3();
@@ -698,7 +698,7 @@ WAvatar.prototype.getAnimationClip=function ( model, bvhData, tPose, seq ) {
 						globalMtx.identity().makeRotationFromQuaternion( globalQuat );
 						globalMtx.multiply( tPose[i] );
 
-						localMtx.identity().getInverse( parentMtx );
+						localMtx.identity().copy( parentMtx ).invert();
 						localMtx.multiply( globalMtx );
 						localMtx.decompose( resultPos, resultQuat, resultScale );
 
@@ -722,7 +722,7 @@ WAvatar.prototype.getAnimationClip=function ( model, bvhData, tPose, seq ) {
 						globalMtx.identity().makeRotationFromQuaternion( globalQuat );
 						globalMtx.multiply( tPose[i] );
 
-						localMtx.identity().getInverse( parentMtx );
+						localMtx.identity().copy( parentMtx ).invert();
 						localMtx.multiply( globalMtx );
 						localMtx.decompose( resultPos, resultQuat, resultScale );
 
@@ -785,7 +785,7 @@ WAvatar.prototype.getAnimationClip=function ( model, bvhData, tPose, seq ) {
 					globalMtx.identity();
 					globalMtx.setPosition( globalPos );
 				   
-					localMtx.identity().getInverse( this.hipParentMtx );
+					localMtx.identity().copy( this.hipParentMtx ).invert();
 					localMtx.multiply( globalMtx );
 
 					localMtx.decompose( resultPos, resultQuat, resultScale );
@@ -811,7 +811,7 @@ WAvatar.prototype.getAnimationClip=function ( model, bvhData, tPose, seq ) {
 					globalMtx.setPosition( globalPos );
 				    //console.log('debug---globalPos---'+bvhData.actionName+'   '+globalPos.x+'  '+globalPos.y+'  '+globalPos.z);
 					//console.log('debug---hipParentMtx---'+bvhData.actionName+'   '+this.hipParentMtx.toArray());
-					localMtx.identity().getInverse( this.hipParentMtx );
+					localMtx.identity().copy( this.hipParentMtx ).invert();
 					localMtx.multiply( globalMtx );
 					
 					localMtx.decompose( resultPos, resultQuat, resultScale );
