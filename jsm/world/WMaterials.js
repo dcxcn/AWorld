@@ -262,6 +262,14 @@ var materials = {
 
 
         }
+		// extrra shader 
+        var extraCompile = null;
+        if( o.extraCompile ){
+        	extraCompile = o.extraCompile;
+        	delete( o.extraCompile );
+			// CUSTOM SHADER
+			
+        }
 		console.log('type==='+type);
 		// create three material
         var mat;
@@ -301,15 +309,10 @@ var materials = {
         mat.isTmp = isTmp;
 
 
-		// extrra shader 
-        var extraCompile = null;
-        if( o.extraCompile ){
-        	extraCompile = o.extraCompile;
-        	delete( o.extraCompile );
-			// CUSTOM SHADER
+	
+		if(extraCompile){
 			materials.customize( mat, o, extraCompile );
-        }
-
+		}
 
 
         // add to data
