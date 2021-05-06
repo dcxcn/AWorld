@@ -57,7 +57,7 @@ var WView = function(loadingManager) {
 	var dracoLoader = new DRACOLoader();
 	dracoLoader.setDecoderPath( './js/libs/draco/gltf/' );
 	gltfLoader.setDRACOLoader( dracoLoader );
-	gltfLoader.setDDSLoader(new DDSLoader());
+	//gltfLoader.setDDSLoader(new DDSLoader());
 	var fbxLoader = new FBXLoader(loadingManager);
 	var mmdLoader = new MMDLoader(loadingManager);
 	var setup =function (_self) {

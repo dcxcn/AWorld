@@ -6,12 +6,15 @@ import { WEBGL } from '../../jsm/libs/WebGL.js';
 
 import * as THREE from '../../jsm/libs/three.module.js';
 import {
+	Geometry,
+} from "../../jsm/three/deprecated/Geometry.js";
+import {
 	Lensflare,
 	LensflareElement
 } from "../../jsm/three/objects/Lensflare.js";
 import { DDSLoader } from '../../jsm/three/loaders/DDSLoader.js';
 import { WTextures } from '../../jsm/world/WTextures.js';
-import { ConvexBufferGeometry } from '../../jsm/three/geometries/ConvexGeometry.js';
+import { ConvexGeometry } from '../../jsm/three/geometries/ConvexGeometry.js';
 import { ThreeBSP } from '../../jsm/three/utils/ThreeBSP.js';
 import { BufferGeometryUtils } from '../../jsm/three/utils/BufferGeometryUtils.js';
 import { TerrainData } from '../../jsm/threex/math/TerrainData.js';
@@ -643,7 +646,10 @@ window.WEngine = (function () {
 		  resultBSP = fobjBSP.union(sobjBSP);
 	  } else if (mergeOP == '#') {
 		  _sobj.updateMatrix();
-		  _fobj.geometry.merge(_sobj.geometry, _sobj.matrix);
+			var g1 = new Geometry().fromBufferGeometry(_fobj.geometry);
+		  var g2 = new Geometry().fromBufferGeometry(_sobj.geometry);
+		  g1.merge(g2, _sobj.matrix);
+		  _fobj.geometry= g1.toBufferGeometry();		 
 		  return _fobj;
 	  } else if (mergeOP == '&') {//交集
 		  resultBSP = fobjBSP.intersect(sobjBSP);
@@ -652,11 +658,14 @@ window.WEngine = (function () {
 	  }
 
 	  var tmMat = null;
-	  if(exparam.matname){
-		  tmMat = _view.getMaterial(exparam.matname);
-	  }else{
-		  tmMat = new THREE.MeshPhongMaterial(exparam.style);
+	  if(exparam){
+		  if(exparam.matname){
+			  tmMat = _view.getMaterial(exparam.matname);
+		  }else{
+			  tmMat = new THREE.MeshPhongMaterial(exparam.style);
+		  }
 	  }
+	  
 	  
 	  var result = resultBSP.toMesh(tmMat);
 	  result.material.flatShading = true;
@@ -714,7 +723,7 @@ window.WEngine = (function () {
 	  var _height = _obj.size[1] || 10;
 	  var _x = _obj.position[0] || 0, _y = _obj.position[1] || 0, _z = _obj.position[2] || 0;
 	  var skinColor = _obj.style.skinColor || 0x98750f;
-	  var cubeGeometry = new THREE.BoxGeometry(_width, _height, _depth, 1, 1, 1);
+	  var cubeGeometry = new Geometry().fromBufferGeometry(new THREE.BoxGeometry(_width, _height, _depth, 1, 1, 1));
 
 	  //六面颜色
 	  for (var i = 0; i < cubeGeometry.faces.length; i += 2) {
@@ -759,8 +768,16 @@ window.WEngine = (function () {
 	  cubeMaterialArray.push(new THREE.MeshLambertMaterial(skin_down_obj));
 	  cubeMaterialArray.push(new THREE.MeshLambertMaterial(skin_right_obj));
 	  cubeMaterialArray.push(new THREE.MeshLambertMaterial(skin_left_obj));
-
-	  var cube = new THREE.Mesh(cubeGeometry, cubeMaterialArray);
+	  var bfGeo = cubeGeometry.toBufferGeometry();
+	  bfGeo.parameters = {
+			width: _width,
+			height: _height,
+			depth: _depth,
+			widthSegments: 1,
+			heightSegments: 1,
+			depthSegments: 1
+		};
+	  var cube = new THREE.Mesh(bfGeo, cubeMaterialArray);
 	  cube.castShadow = true;
 	  cube.receiveShadow = true;
 	  cube.uuid = _obj.uuid;
@@ -832,7 +849,7 @@ window.WEngine = (function () {
 	}
 	  */
 	  var bLength = _obj.size[0],bHeight = _obj.size[1],bWidth =  _obj.size[2],bThick = _obj.size[3];
-	  //创建五个面
+		  //创建五个面
 	  //上
 	  var upobj= {
 		  show: true,
@@ -907,7 +924,6 @@ window.WEngine = (function () {
 	  }
 	  var Downcube = _engine.createCube( Downobj,true);
 	  Cabinet = _engine.mergeModel( '#', Cabinet, Downcube);
-	 
 	  var tempobj = new THREE.Group();
 	  tempobj.add(Cabinet);
 	  tempobj.name = _obj.name;
@@ -1299,6 +1315,7 @@ window.WEngine = (function () {
 		var sky = new Sky();
 		sky.scale.setScalar( 450000 );
 		_engine.sky = sky;
+		_view.scene.add( sky );
 		var sunSphere = new THREE.Mesh(
 			new THREE.SphereBufferGeometry( 20000, 16, 8 ),
 			new THREE.MeshBasicMaterial( { color: 0xffffff } )
@@ -1682,7 +1699,7 @@ window.WEngine = (function () {
 			roadblock:curO.roadblock,
 			blockSize:curO.blockSize,
 			v:curO.pointsfun(),
-			shape:new ConvexBufferGeometry( curO.pointsfun() ),
+			shape:new ConvexGeometry( curO.pointsfun() ),
 			mass:curO.mass,
 			pos:curO.position,
 			rot:curO.rot,
@@ -1983,7 +2000,7 @@ window.WEngine = (function () {
 
 			  });
 			}
-			curWall.geometry = new THREE.BufferGeometry().fromGeometry(curWall.geometry );
+			//curWall.geometry = curWall.geometry.toBufferGeometry();
 			_physic.add({ 
 					type:'mesh',
 					shape:curWall.geometry,

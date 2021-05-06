@@ -104,66 +104,61 @@ export { RayCaster };
 //   RAY CLASS
 //--------------------------------------
 
-function Ray( o ) {
+class Ray extends THREE.Line {
+	constructor( o ){
+		super();
+		this.type = 'ray';
 
-	THREE.Line.call( this );
+		this.name = o.name;
+		this.enabled = o.enabled !== undefined ? o.enabled : true;
 
-	this.type = 'ray';
+		this.precision =  o.precision !== undefined ? o.precision : 1;
 
-	this.name = o.name;
-	this.enabled = o.enabled !== undefined ? o.enabled : true;
+		this.callback = o.callback || function () {};
 
-	this.precision =  o.precision !== undefined ? o.precision : 1;
+		this.position.fromArray( o.pos || [ 0, 0, 0 ] );
 
-	this.callback = o.callback || function () {};
+		this.group = o.group !== undefined ? o.group : 1;
+		this.mask = o.mask !== undefined ? o.mask : - 1;
 
-	this.position.fromArray( o.pos || [ 0, 0, 0 ] );
+		this.origin = [ 0, 0, 0 ];
+		this.dest = [ 0, 0, 0 ];
 
-	this.group = o.group !== undefined ? o.group : 1;
-	this.mask = o.mask !== undefined ? o.mask : - 1;
+		this.start = new THREE.Vector3().fromArray( o.start || [ 0, 0, 0 ] );
+		this.end = new THREE.Vector3().fromArray( o.end || [ 0, 10, 0 ] );
+		//this.direction = new THREE.Vector3();
+		this.maxDistance = this.start.distanceTo( this.end );
 
-	this.origin = [ 0, 0, 0 ];
-	this.dest = [ 0, 0, 0 ];
+		// tmp
+		this.tmp = new THREE.Vector3();
+		this.normal = new THREE.Vector3();
+		this.inv = new THREE.Matrix4();
 
-	this.start = new THREE.Vector3().fromArray( o.start || [ 0, 0, 0 ] );
-	this.end = new THREE.Vector3().fromArray( o.end || [ 0, 10, 0 ] );
-	//this.direction = new THREE.Vector3();
-	this.maxDistance = this.start.distanceTo( this.end );
+		// color
+		this.c1 = [ 0.1, 0.1, 0.1 ];
+		this.c2 = [ 1.0, 0.1, 0.1 ];
 
-	// tmp
-	this.tmp = new THREE.Vector3();
-	this.normal = new THREE.Vector3();
-	this.inv = new THREE.Matrix4();
+		// geometry
 
-	// color
-	this.c1 = [ 0.1, 0.1, 0.1 ];
-	this.c2 = [ 1.0, 0.1, 0.1 ];
+		this.vertices = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+		this.colors = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+		this.local = [ 0, 0, 0, 0, 0, 0 ];
 
-	// geometry
+		this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.vertices, 3 ) );
+		this.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( this.colors, 3 ) );
+		this.vertices = this.geometry.attributes.position.array;
+		this.colors = this.geometry.attributes.color.array;
 
-	this.vertices = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-	this.colors = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-	this.local = [ 0, 0, 0, 0, 0, 0 ];
+		this.material.color.setHex( 0xFFFFFF );
+		this.material.vertexColors = THREE.VertexColors;
 
-	this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.vertices, 3 ) );
-	this.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( this.colors, 3 ) );
-	this.vertices = this.geometry.attributes.position.array;
-	this.colors = this.geometry.attributes.color.array;
+		this.base = false;
 
-	this.material.color.setHex( 0xFFFFFF );
-	this.material.vertexColors = THREE.VertexColors;
+		this.info = { hit:false, name:'', distance:0 };
 
-	this.base = false;
-
-	this.info = { hit:false, name:'', distance:0 };
-
-	this.upGeo();
-
-}
-
-Ray.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
-
-	setFromCamera: function ( coords, camera ) {
+		this.upGeo();
+	}
+	setFromCamera ( coords, camera ) {
 
 		if ( ( camera && camera.isPerspectiveCamera ) ) {
 
@@ -184,9 +179,9 @@ Ray.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
 
 		}
 
-	},
+	}
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld  ( force ) {
 
 		THREE.Line.prototype.updateMatrixWorld.call( this, force );
 		this.tmp.copy( this.start ).applyMatrix4( this.matrixWorld );
@@ -195,9 +190,9 @@ Ray.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
 		this.tmp.toArray( this.dest, 0 );
 		this.inv.getInverse( this.matrixWorld );
 
-	},
+	}
 
-	upGeo: function ( hit ) {
+	upGeo  ( hit ) {
 
 		if ( ! this.enabled ) return;
 
@@ -249,9 +244,8 @@ Ray.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
 
 		}
 
-	},
-
-	update: function ( o ) {
+	}
+	update  ( o ) {
 
 		this.info.hit = o.hit;
 		this.info.name = o.name || '';
@@ -285,6 +279,5 @@ Ray.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
 
 	}
 
-} );
-
+}
 export { Ray };

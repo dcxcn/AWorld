@@ -7,8 +7,7 @@ import { Vehicle } from '../ammo/physic/Vehicle.js';
 import { Character } from '../ammo/physic/Character.js';
 import { Collision } from '../ammo/physic/Collision.js';
 import { RayCaster } from '../ammo/physic/RayCaster.js';
-//import { ConvexObjectBreaker } from '../../three/misc/ConvexObjectBreaker.js';
-import { ConvexObjectBreaker } from '../ammo/physic/ConvexObjectBreaker.js';
+import { ConvexObjectBreaker } from '../../jsm/three/misc/ConvexObjectBreaker.js';
 import { LZMAdecompact } from '../ammo/physic/lzma.js';
 import { root, map, REVISION } from '../ammo/physic/root.js';
 
@@ -953,11 +952,12 @@ export var physic = ( function () {
 
 			var mesh = map.get( name );
 
-			
+			mesh.userData.velocity = mesh.userData.velocity||new THREE.Vector3();
+			mesh.userData.angularVelocity = mesh.userData.angularVelocity||new THREE.Vector3();
 			// breakOption: [ maxImpulse, maxRadial, maxRandom, levelOfSubdivision ]
 			var breakOption = o.breakOption;
 
-			var debris = convexBreaker.subdivideByImpact( mesh, o.pos, o.normal, breakOption[ 1 ], breakOption[ 2 ] ); // , 1.5 ??
+			var debris = convexBreaker.subdivideByImpact( mesh, new THREE.Vector3().fromArray(o.pos), new THREE.Vector3().fromArray(o.normal), breakOption[ 1 ], breakOption[ 2 ] ); // , 1.5 ??
 			// remove one level
 			breakOption[ 3 ] -= 1;
 			

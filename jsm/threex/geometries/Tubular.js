@@ -3,7 +3,6 @@ import {
 	Vector3,
 	Quaternion,
 	CatmullRomCurve3,
-	Geometry,
 	BufferGeometry,
 	Uint32BufferAttribute,
 	Uint16BufferAttribute,
@@ -12,7 +11,9 @@ import {
 	LineBasicMaterial
 	
 } from "../../libs/three.module.js";
-
+import {
+	Geometry,
+} from "../../three/deprecated/Geometry.js";
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *

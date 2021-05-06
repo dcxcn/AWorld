@@ -3,11 +3,13 @@ import {
 	Vector2,
 	Vector3,
 	Matrix4,
-	Face3,
-	Face4,
-	Geometry,
+	BufferGeometry,
 	Mesh	
 } from "../../../jsm/libs/three.module.js";
+import {	
+	Face3,
+	Geometry,
+} from "../../../jsm/three/deprecated/Geometry.js";
 var ThreeBSP = (function() {
 	
 	var ThreeBSP,
@@ -18,6 +20,7 @@ var ThreeBSP = (function() {
 		SPANNING = 3;
 	
 	ThreeBSP = function( geometry ) {
+		
 		// Convert Geometry to ThreeBSP
 		var i, _length_i,
 			face, vertex, faceVertexUvs, uvs,
@@ -25,13 +28,17 @@ var ThreeBSP = (function() {
 			polygons = [],
 			tree;
 	
-		if ( geometry instanceof Geometry ) {
+		if (geometry instanceof BufferGeometry){
+			geometry = new Geometry().fromBufferGeometry(geometry);
+			this.matrix = new Matrix4;
+		}
+		else if ( geometry instanceof Geometry ) {
 			this.matrix = new Matrix4;
 		} else if ( geometry instanceof Mesh ) {
 			// #todo: add hierarchy support
 			geometry.updateMatrix();
 			this.matrix = geometry.matrix.clone();
-			geometry = geometry.geometry;
+			geometry = new Geometry().fromBufferGeometry(geometry.geometry);
 		} else if ( geometry instanceof ThreeBSP.Node ) {
 			this.tree = geometry;
 			this.matrix = new Matrix4;
@@ -211,7 +218,7 @@ var ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.toMesh = function( material ) {
 		var geometry = this.toGeometry(),
-			mesh = new Mesh( geometry, material );
+			mesh = new Mesh( geometry.toBufferGeometry(), material );
 		
 		mesh.position.setFromMatrixPosition( this.matrix );
 		mesh.rotation.setFromRotationMatrix( this.matrix );

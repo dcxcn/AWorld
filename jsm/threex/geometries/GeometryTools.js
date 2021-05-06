@@ -1,10 +1,12 @@
 import {
-	Geometry,
 	BufferGeometry,
 	BufferAttribute,
 	Float32BufferAttribute
 	
 } from '../../libs/three.module.js';
+import {
+	Geometry,
+} from "../../three/deprecated/Geometry.js";
 var GeometryTools = {
 
     reversUV: function ( geometry ){

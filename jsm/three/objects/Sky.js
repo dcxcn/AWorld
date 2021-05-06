@@ -16,31 +16,35 @@
 
 import {
 	BackSide,
-	BoxBufferGeometry,
+	BoxGeometry,
 	Mesh,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3
 } from "../../libs/three.module.js";
 
-var Sky = function () {
+class Sky extends Mesh {
 
-	var shader = Sky.SkyShader;
+	constructor() {
 
-	var material = new ShaderMaterial( {
-		fragmentShader: shader.fragmentShader,
-		vertexShader: shader.vertexShader,
-		uniforms: UniformsUtils.clone( shader.uniforms ),
-		side: BackSide,
-		depthWrite: false
-	} );
+		const shader = Sky.SkyShader;
 
-	Mesh.call( this, new BoxBufferGeometry( 1, 1, 1 ), material );
+		const material = new ShaderMaterial( {
+			name: 'SkyShader',
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: UniformsUtils.clone( shader.uniforms ),
+			side: BackSide,
+			depthWrite: false
+		} );
 
-};
+		super( new BoxGeometry( 1, 1, 1 ), material );
 
-Sky.prototype = Object.create( Mesh.prototype );
+	}
 
+}
+
+Sky.prototype.isSky = true;
 Sky.SkyShader = {
 
 	uniforms: {

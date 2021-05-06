@@ -1,15 +1,16 @@
 import {
 	PlaneGeometry,
-	Geometry,
 	Matrix4,
 	Vector3,
 	BufferGeometry,
 	Mesh
 } from "../../libs/three.module.js";
-
+import {
+	Geometry,
+} from "../../three/deprecated/Geometry.js";
 var PlantTufts	= {};
 PlantTufts.create = function(positions,size,material){
-	var geometry = new PlaneGeometry(size[0], size[1]);
+	var geometry =  new Geometry().fromBufferGeometry(new PlaneGeometry(size[0], size[1]));
 	//geometry.applyMatrix4( new Matrix4().makeTranslation( 0, geometry.height/2, 0 ) );
 
 
@@ -40,9 +41,7 @@ PlantTufts.create = function(positions,size,material){
 		}
 	}
 
-
-	var bfGeo = new BufferGeometry();
-	var mesh = new Mesh(bfGeo.fromGeometry(mergedGeo), material);
+	var mesh = new Mesh(mergedGeo.toBufferGeometry(), material);
 	return mesh;
 }
 export {PlantTufts};

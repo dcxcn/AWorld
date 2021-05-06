@@ -2,13 +2,15 @@
 import { ConvexHull } from './ConvexHull.js';
 import { BufferGeometryUtils } from '../../three/utils/BufferGeometryUtils.js';
 import {
-	Geometry,
 	BufferGeometry,
 	Matrix4,
 	SphereGeometry,
 	CylinderGeometry,
 	Float32BufferAttribute
 } from "../../libs/three.module.js";
+import {
+	Geometry,
+} from "../../three/deprecated/Geometry.js";
 export function geometryInfo( g, type ) {
 
         var verticesOnly = false;
@@ -183,10 +185,8 @@ function mapIndices( bufGeometry, indexedBufferGeom ) {
 * CAPSULE GEOMETRY
 */
 
-function Capsule( radius, height, radialSegs, heightSegs ) {
-
-	BufferGeometry.call( this );
-
+function Capsule ( radius, height, radialSegs, heightSegs) {
+		
 	this.type = 'Capsule';
 
     radius = radius || 1;
@@ -201,11 +201,11 @@ function Capsule( radius, height, radialSegs, heightSegs ) {
     var o0 = Math.PI * 2;
     var o1 = Math.PI * 0.5;
     var g = new Geometry();
-    var m0 = new CylinderGeometry( radius, radius, height, radialSegs, heightSegs, true );
+    var m0 = new Geometry().fromBufferGeometry(new CylinderGeometry( radius, radius, height, radialSegs, heightSegs, true ));
 
     var mr = new Matrix4();
-    var m1 = new SphereGeometry( radius, radialSegs, sHeight, 0, o0, 0, o1);
-    var m2 = new SphereGeometry( radius, radialSegs, sHeight, 0, o0, o1, o1);
+    var m1 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, 0, o1));
+    var m2 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, o1, o1));
     var mtx0 = new Matrix4().makeTranslation( 0,0,0 );
 	if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
     //if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
@@ -222,10 +222,12 @@ function Capsule( radius, height, radialSegs, heightSegs ) {
     m0.dispose();
     m1.dispose();
     m2.dispose();
+	
+	var bfgeo = Geometry.createBufferGeometryFromObject(g);
 
-    this.fromGeometry( g );
 
     g.dispose();
+	return bfgeo;
 
 }
 

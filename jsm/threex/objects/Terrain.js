@@ -1,5 +1,4 @@
-import {	
-	Geometry,
+import {
 	BufferGeometry,
 	PlaneGeometry,
 	PlaneBufferGeometry,
@@ -10,253 +9,250 @@ import {
 	Vector2,
 	Vector3
 } from "../../libs/three.module.js";
+import {
+	Geometry,
+} from "../../three/deprecated/Geometry.js";
+class Terrain extends Mesh {
 
-var Terrain = function  ( o ) {
+	constructor(o){
+		o = o === undefined ? {} : o;
 
-    o = o === undefined ? {} : o;
+		super();
+		// terrain, water, road
+		this.ttype = o.terrainType || 'terrain';
+		this.name = o.name || 'terrain0';
+		this.needsUpdate = false;
 
-    // terrain, water, road
-    this.ttype = o.terrainType || 'terrain';
-    this.name = o.name || 'terrain0';
-    this.needsUpdate = false;
+		this.callback = null;
+		this.physicsUpdate = o.physicsUpdate || function(){};
 
-    this.callback = null;
-    this.physicsUpdate = o.physicsUpdate || function(){};
+		this.uvx = [ o.uv || 18, o.uv || 18 ];
 
-    this.uvx = [ o.uv || 18, o.uv || 18 ];
 
+		this.sample = o.sample == undefined ? [64,64] : o.sample;
+		this.size = o.size === undefined ? [100,10,100] : o.size;
 
-    this.sample = o.sample == undefined ? [64,64] : o.sample;
-    this.size = o.size === undefined ? [100,10,100] : o.size;
+		this.data = {
+			level: o.level || [1,0.2,0.05],
+			frequency: o.frequency || [0.016,0.05,0.2],
+			expo: o.expo || 1,
+		}
 
-    this.data = {
-        level: o.level || [1,0.2,0.05],
-        frequency: o.frequency || [0.016,0.05,0.2],
-        expo: o.expo || 1,
-    }
+		this.isWater = o.water || false;
 
-    this.isWater = o.water || false;
+		this.isBorder = false;
+		this.wantBorder = o.border || false;
 
-    this.isBorder = false;
-    this.wantBorder = o.border || false;
+		this.isBottom = false;
+		this.wantBottom = o.bottom || false;
 
-    this.isBottom = false;
-    this.wantBottom = o.bottom || false;
+		this.colorBase = this.isWater ? { r:0, g:0.7, b:1 } : { r:1, g:0.7, b:0 };
 
-    this.colorBase = this.isWater ? { r:0, g:0.7, b:1 } : { r:1, g:0.7, b:0 };
+		this.maxspeed = o.maxSpeed || 0.1;
+		this.acc = o.acc == undefined ? 0.01 : o.acc;
+		this.dec = o.dec == undefined ? 0.01 : o.dec;
 
-    this.maxspeed = o.maxSpeed || 0.1;
-    this.acc = o.acc == undefined ? 0.01 : o.acc;
-    this.dec = o.dec == undefined ? 0.01 : o.dec;
+		this.deep = o.deep == undefined ? 0 : o.deep;
 
-    this.deep = o.deep == undefined ? 0 : o.deep;
+		this.ease = new Vector2();
 
-    this.ease = new Vector2();
+		// for perlin
+		this.complexity = o.complexity == undefined ? 30 : o.complexity;
+		this.complexity2 = o.complexity2 == undefined ? null : o.complexity2;
 
-    // for perlin
-    this.complexity = o.complexity == undefined ? 30 : o.complexity;
-    this.complexity2 = o.complexity2 == undefined ? null : o.complexity2;
+		this.local = new Vector3();
+		if( o.local ) this.local.fromArray( o.local );
 
-    this.local = new Vector3();
-    if( o.local ) this.local.fromArray( o.local );
+		this.pp = new Vector3();
 
-    this.pp = new Vector3();
+		this.lng = this.sample[0] * this.sample[1];
+		var sx = this.sample[0] - 1;
+		var sz = this.sample[1] - 1;
+		this.rx = sx / this.size[0];
+		this.rz = sz / this.size[2];
+		this.ratio = 1 / this.sample[0];
+		this.ruvx =  1.0 / ( this.size[0] / this.uvx[0] );
+		this.ruvy = - ( 1.0 / ( this.size[2] / this.uvx[1] ) );
 
-    this.lng = this.sample[0] * this.sample[1];
-    var sx = this.sample[0] - 1;
-    var sz = this.sample[1] - 1;
-    this.rx = sx / this.size[0];
-    this.rz = sz / this.size[2];
-    this.ratio = 1 / this.sample[0];
-    this.ruvx =  1.0 / ( this.size[0] / this.uvx[0] );
-    this.ruvy = - ( 1.0 / ( this.size[2] / this.uvx[1] ) );
+		this.is64 = o.is64 || false;
 
-    this.is64 = o.is64 || false;
+		this.heightData = this.is64 ? new Float64Array( this.lng ) : new Float32Array( this.lng );
+		this.height = [];
 
-    this.heightData = this.is64 ? new Float64Array( this.lng ) : new Float32Array( this.lng );
-    this.height = [];
+		this.isAbsolute = o.isAbsolute || false;
+		this.isReverse = o.isReverse || false;
+		if( this.isReverse ) this.getReverseID();
 
-    this.isAbsolute = o.isAbsolute || false;
-    this.isReverse = o.isReverse || false;
-    if( this.isReverse ) this.getReverseID();
+		this.colors = new Float32Array( this.lng * 3 );
+		this.geometry = new PlaneBufferGeometry( this.size[0], this.size[2], this.sample[0] - 1, this.sample[1] - 1 );
+		this.geometry.rotateX( -Math.PI90 );
+		this.geometry.computeBoundingSphere();
 
-    this.colors = new Float32Array( this.lng * 3 );
-    this.geometry = new PlaneBufferGeometry( this.size[0], this.size[2], this.sample[0] - 1, this.sample[1] - 1 );
-    this.geometry.rotateX( -Math.PI90 );
-    this.geometry.computeBoundingSphere();
+		this.geometry.setAttribute( 'color', new BufferAttribute( this.colors, 3 ) );
+		//this.geometry.setAttribute( 'uv2', this.geometry.attributes.uv );
+		this.vertices = this.geometry.attributes.position.array;
 
-    this.geometry.setAttribute( 'color', new BufferAttribute( this.colors, 3 ) );
-    //this.geometry.setAttribute( 'uv2', this.geometry.attributes.uv );
-    this.vertices = this.geometry.attributes.position.array;
+		this.waterNormal = this.isWater ? window.WEngine.three.texture({ url:'terrain/water_n.jpg',name:'water_n',repeat:[ o.uv || 3, o.uv || 3 ]}) : null;
+		this.hasHeightMap = o.heightMapUrl?true:false;
+		this.heightMapUrl = o.heightMapUrl;
+		var materialData = { 
+			
+			name:'terrain_'+Math.generateUUID(), 
+			vertexColors: VertexColors, 
 
-    this.waterNormal = this.isWater ? window.WEngine.three.texture({ url:'terrain/water_n.jpg',name:'water_n',repeat:[ o.uv || 3, o.uv || 3 ]}) : null;
-	this.hasHeightMap = o.heightMapUrl?true:false;
-	this.heightMapUrl = o.heightMapUrl;
-    var materialData = { 
-        
-        name:'terrain_'+Math.generateUUID(), 
-        vertexColors: VertexColors, 
+			metalness: this.isWater ? 0.8 : 0.2, 
+			roughness: this.isWater ? 0.2 : 0.6, 
 
-        metalness: this.isWater ? 0.8 : 0.2, 
-        roughness: this.isWater ? 0.2 : 0.6, 
+			normalScale:o.normalScale || (this.isWater ? [0.25,0.25]:[2,2]),
+		 
+			transparent: this.isWater ? true : false,
+			opacity: this.isWater ? (o.opacity || 0.8) : 1,
+			premultipliedAlpha: this.isWater,
 
-        normalScale:o.normalScale || (this.isWater ? [0.25,0.25]:[2,2]),
-     
-        transparent: this.isWater ? true : false,
-        opacity: this.isWater ? (o.opacity || 0.8) : 1,
-        premultipliedAlpha: this.isWater,
 
+			//side: this.isWater ? 'Double' : 'Front',
+			//depthWrite: !this.isWater,
 
-        //side: this.isWater ? 'Double' : 'Front',
-        //depthWrite: !this.isWater,
+		};
 
-    };
 
+		if( this.isWater ){ 
 
-    if( this.isWater ){ 
+			materialData.normalMap = this.waterNormal;
 
-        materialData.normalMap = this.waterNormal;
+		} else {
 
-    } else {
+			this.maps = o.maps || [ 'sand', 'grass', 'rock', 'sand_n', 'grass_n', 'rock_n' ];
 
-        this.maps = o.maps || [ 'sand', 'grass', 'rock', 'sand_n', 'grass_n', 'rock_n' ];
+			var txt = {}
+			var name;
+			for( var i in this.maps ){
 
-        var txt = {}
-        var name;
-        for( var i in this.maps ){
+				name = this.maps[i];
+				txt[name] = window.WEngine.view.texture({ url:'terrain/'+name+'.jpg',name:name, repeat:this.uvx});
 
-            name = this.maps[i];
-            txt[name] = window.WEngine.view.texture({ url:'terrain/'+name+'.jpg',name:name, repeat:this.uvx});
+			}
 
-        }
+			materialData.map = txt[ this.maps[0] ];
+			materialData.normalMap = txt[ this.maps[0] + '_n' ];
 
-        materialData.map = txt[ this.maps[0] ];
-        materialData.normalMap = txt[ this.maps[0] + '_n' ];
+			this.isORM = false;
+			this.isDIS = false;
 
-        this.isORM = false;
-        this.isDIS = false;
+			if( this.maps.length > 6 ){ 
 
-        if( this.maps.length > 6 ){ 
 
+				this.isORM = true;
 
-            this.isORM = true;
+				materialData.aoMapIntensity = o.ao || 1;
+				materialData.metalness = 1;
+				materialData.roughness = 1;
+				materialData.roughnessMap = txt[ this.maps[0] + '_orm' ];
+				materialData.aoMap = txt[ this.maps[0] + '_orm' ];
 
-            materialData.aoMapIntensity = o.ao || 1;
-            materialData.metalness = 1;
-            materialData.roughness = 1;
-            materialData.roughnessMap = txt[ this.maps[0] + '_orm' ];
-            materialData.aoMap = txt[ this.maps[0] + '_orm' ];
+			}
 
-        }
+			if( this.maps.length > 9 ){ 
 
-        if( this.maps.length > 9 ){ 
 
+				this.isDIS = true;
 
-            this.isDIS = true;
+				materialData.displacementBias = 0;
+				materialData.displacementScale = o.displacementScale || 1;
+				materialData.displacementMap = txt[ this.maps[0] + '_d' ];
 
-            materialData.displacementBias = 0;
-            materialData.displacementScale = o.displacementScale || 1;
-            materialData.displacementMap = txt[ this.maps[0] + '_d' ];
+			}
 
-        }
+			var self = this;
 
-        var self = this;
+			materialData.extraCompile = function ( shader ) {
 
-        materialData.extraCompile = function ( shader ) {
+				//console.log(shader)
 
-            //console.log(shader)
+				var uniforms = shader.uniforms;
 
-            var uniforms = shader.uniforms;
+				uniforms['map1'] = { value: txt[self.maps[1]] };
+				uniforms['map2'] = { value: txt[self.maps[2]] };
 
-            uniforms['map1'] = { value: txt[self.maps[1]] };
-            uniforms['map2'] = { value: txt[self.maps[2]] };
+				uniforms['normalMap1'] = { value: txt[self.maps[1]+'_n'] };
+				uniforms['normalMap2'] = { value: txt[self.maps[2]+'_n'] };
 
-            uniforms['normalMap1'] = { value: txt[self.maps[1]+'_n'] };
-            uniforms['normalMap2'] = { value: txt[self.maps[2]+'_n'] };
+				if( self.isORM ){
+					uniforms['roughnessMap1'] = { value: txt[self.maps[1]+'_orm'] };
+					uniforms['roughnessMap2'] = { value: txt[self.maps[2]+'_orm'] };
+				}
 
-            if( self.isORM ){
-                uniforms['roughnessMap1'] = { value: txt[self.maps[1]+'_orm'] };
-                uniforms['roughnessMap2'] = { value: txt[self.maps[2]+'_orm'] };
-            }
+				if( self.isDIS ){
+					uniforms['displacementMap1'] = { value: txt[self.maps[1]+'_d'] };
+					uniforms['displacementMap2'] = { value: txt[self.maps[2]+'_d'] };
+				}
 
-            if( self.isDIS ){
-                uniforms['displacementMap1'] = { value: txt[self.maps[1]+'_d'] };
-                uniforms['displacementMap2'] = { value: txt[self.maps[2]+'_d'] };
-            }
+				shader.uniforms = uniforms;
 
-            shader.uniforms = uniforms;
 
+				var vertex = shader.vertexShader;
+				var fragment = shader.fragmentShader;
 
-            var vertex = shader.vertexShader;
-            var fragment = shader.fragmentShader;
+				var T = TerrainShader;
 
-            var T = TerrainShader;
+				fragment = fragment.replace( '#include <map_pars_fragment>', T.map_pars );
+				fragment = fragment.replace( '#include <normalmap_pars_fragment>', T.normal_pars );
 
-            fragment = fragment.replace( '#include <map_pars_fragment>', T.map_pars );
-            fragment = fragment.replace( '#include <normalmap_pars_fragment>', T.normal_pars );
+				fragment = fragment.replace( '#include <map_fragment>', T.map );
+				fragment = fragment.replace( '#include <normal_fragment_maps>', T.normal );
 
-            fragment = fragment.replace( '#include <map_fragment>', T.map );
-            fragment = fragment.replace( '#include <normal_fragment_maps>', T.normal );
+				fragment = fragment.replace( '#include <color_fragment>', '' );
 
-            fragment = fragment.replace( '#include <color_fragment>', '' );
+				if( self.isORM ){
+					
+					fragment = fragment.replace( '#include <roughnessmap_pars_fragment>', T.rough_pars );
+					fragment = fragment.replace( '#include <metalnessmap_pars_fragment>', '' );
+					fragment = fragment.replace( '#include <aomap_pars_fragment>', '' );
 
-            if( self.isORM ){
-                
-                fragment = fragment.replace( '#include <roughnessmap_pars_fragment>', T.rough_pars );
-                fragment = fragment.replace( '#include <metalnessmap_pars_fragment>', '' );
-                fragment = fragment.replace( '#include <aomap_pars_fragment>', '' );
+					
+					fragment = fragment.replace( '#include <roughnessmap_fragment>', T.rough );
+					fragment = fragment.replace( '#include <metalnessmap_fragment>', '' );
+					fragment = fragment.replace( '#include <aomap_fragment>', T.ao );
 
-                
-                fragment = fragment.replace( '#include <roughnessmap_fragment>', T.rough );
-                fragment = fragment.replace( '#include <metalnessmap_fragment>', '' );
-                fragment = fragment.replace( '#include <aomap_fragment>', T.ao );
+				}
 
-            }
+				if( self.isDIS ){
 
-            if( self.isDIS ){
+					vertex = vertex.replace( '#include <displacementmap_pars_vertex>', T.displacement_part );
+					vertex = vertex.replace( '#include <displacementmap_vertex>', T.displacement );
 
-                vertex = vertex.replace( '#include <displacementmap_pars_vertex>', T.displacement_part );
-                vertex = vertex.replace( '#include <displacementmap_vertex>', T.displacement );
+				}
 
-            }
+				
+				shader.fragmentShader = fragment;
+				shader.vertexShader = vertex;
 
-            
-            shader.fragmentShader = fragment;
-            shader.vertexShader = vertex;
+				return shader;
+			}
 
-            return shader;
-        }
+		}
 
-    }
+		//this.uniforms = uniforms;
 
-    //this.uniforms = uniforms;
+		this.material = window.WEngine.view.material( materialData );
 
-    this.material = window.WEngine.view.material( materialData );
-    
 
-    Mesh.call( this, this.geometry, this.material );
+		if( this.wantBorder ) this.addBorder( o );
+		if( this.wantBottom ) this.addBottom( o );
+		if( this.hasHeightMap){
+			this.update_hmap();	
+		}else{
+			this.update_noise();
+		}   
+		this.name = o.name === undefined ? 'terrain' : o.name;
+		if( o.pos ) this.position.fromArray( o.pos );
 
-    if( this.wantBorder ) this.addBorder( o );
-    if( this.wantBottom ) this.addBottom( o );
-	if( this.hasHeightMap){
-		this.update_hmap();	
-	}else{
-		this.update_noise();
-	}   
-    this.name = o.name === undefined ? 'terrain' : o.name;
-    if( o.pos ) this.position.fromArray( o.pos );
 
-
-    this.castShadow = false;
-    this.receiveShadow = true;
-
-};
-
-Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
-
-    constructor: Terrain,
-
-    addBottom: function ( o ){
+		this.castShadow = false;
+		this.receiveShadow = true;
+	}
+	
+	addBottom ( o ){
 
     	var geometry = new PlaneBufferGeometry( this.size[0], this.size[2], 1, 1 );
         geometry.rotateX( Math.PI90 );
@@ -266,9 +262,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
         this.add( this.bottomMesh );
 
         this.isBottom = true;
-    },
-
-    addBorder: function ( o ){
+    }
+	
+	addBorder  ( o ){
 
     	this.borderMaterial = window.WEngine.view.material({ 
 
@@ -302,14 +298,14 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
         var border = new Geometry();
 
-        border.merge( front );
-        border.merge( back );
-        border.merge( left );
-        border.merge( right );
+        border.merge( new Geometry().fromBufferGeometry(front) );
+        border.merge( new Geometry().fromBufferGeometry(back) );
+        border.merge( new Geometry().fromBufferGeometry(left) );
+        border.merge( new Geometry().fromBufferGeometry(right) );
 
         border.mergeVertices();
 
-        this.borderGeometry = new BufferGeometry().fromGeometry( border );
+        this.borderGeometry = border.toBufferGeometry();
         this.borderVertices = this.borderGeometry.attributes.position.array;
         this.lng2 = this.borderVertices.length / 3;
         this.list = new Array( this.lng2 )
@@ -328,16 +324,16 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
         this.add( this.borderMesh );
         this.isBorder = true;
 
-    },
-
-    dispose: function () {
+    }
+	
+	 dispose () {
 
         this.geometry.dispose();
         this.material.dispose();
         
-    },
-
-    easing: function ( wait ) {
+    }
+	
+	easing  ( wait ) {
 
         var key = window.user.key;
 
@@ -376,9 +372,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
         this.update( wait );
 
-    },
+    }
 
-    getHeight: function ( x, z ) {
+	getHeight ( x, z ) {
 
         x *= this.rx;
         z *= this.rz; 
@@ -389,15 +385,15 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
         var h = this.height[ this.findId( x, z ) ] || 1;
         return ( h * this.size[ 1 ] ) + this.position.y;
 
-    },
+    }
 
-    findId: function( x, z ){
+    findId ( x, z ){
 
         return x+(z*this.sample[1]);
 
-    },
-
-    findPoint: function( x, z ){
+    }
+	
+	findPoint ( x, z ){
 
         var i = this.lng, n;
         while( i-- ){
@@ -407,9 +403,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
         return -1;
 
-    },
+    }
 
-    getReverseID: function () {
+    getReverseID () {
 
         this.invId = [];
 
@@ -423,9 +419,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
             this.invId[i] = this.findId( x, zr );
         }
 
-    },
-
-    update_noise: function ( wait ) {
+    }
+	
+	update_noise ( wait ) {
 
 
         if( this.isWater ){ 
@@ -549,8 +545,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
         if( wait === undefined ) this.updateGeometry();
 
-    },
-	update_hmap:function(){
+    }
+	
+	update_hmap (){
 		            
         if( this.isWater ){ 
             this.waterNormal.offset.x+=0.002;
@@ -629,8 +626,9 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			_self.updateGeometry();
 
 		}});
-	},
-    updateGeometry: function () {
+	}
+	
+	 updateGeometry () {
 
         this.geometry.attributes.position.needsUpdate = true;
         this.geometry.attributes.color.needsUpdate = true;
@@ -642,8 +640,7 @@ Terrain.prototype = Object.assign( Object.create( Mesh.prototype ), {
         }
 
     }
-
-});
+};
 
 // SHADERS
 
