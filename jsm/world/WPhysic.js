@@ -1177,7 +1177,7 @@ export var physic = ( function () {
 			var m1 = new THREE.Matrix4();
 			var s = new THREE.Vector3(1,1,1);
 			var m0 = new THREE.Matrix4().compose( mesh.position, mesh.quaternion, s );
-			m1.getInverse( m0 );
+			m1.copy( m0 ).invert();
 			return vector.applyMatrix4( m1 );
 
 		},

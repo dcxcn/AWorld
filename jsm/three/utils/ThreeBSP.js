@@ -151,7 +151,7 @@ var ThreeBSP = (function() {
 	};
 	ThreeBSP.prototype.toGeometry = function() {
 		var i, j,
-			matrix = new Matrix4().getInverse( this.matrix ),
+			matrix = new Matrix4().copy( this.matrix ).invert(),
 			geometry = new Geometry(),
 			polygons = this.tree.allPolygons(),
 			polygon_count = polygons.length,

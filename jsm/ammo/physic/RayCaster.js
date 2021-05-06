@@ -188,7 +188,7 @@ class Ray extends THREE.Line {
 		this.tmp.toArray( this.origin, 0 );
 		this.tmp.copy( this.end ).applyMatrix4( this.matrixWorld );
 		this.tmp.toArray( this.dest, 0 );
-		this.inv.getInverse( this.matrixWorld );
+		this.inv.copy( this.matrixWorld ).invert();
 
 	}
 
