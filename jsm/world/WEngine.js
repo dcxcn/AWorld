@@ -680,7 +680,7 @@ class WorldEngine extends THREE.EventDispatcher {
 	}
 
 	showPhysicInfo(v) {
-		showPhyinfo = v;
+		this.showPhyinfo = v;
 	}
 
 	getBBoxGeometry(obj) {
