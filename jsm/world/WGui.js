@@ -536,13 +536,13 @@ class WGui {
 			}
 		};
 		this.fullSc.addEventListener('click', toggleFullScreen, false);
-		this.fullSc.addEventListener('mouseover', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', selectColor, 30, 30); }, false);
+		this.fullSc.addEventListener('mouseover', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', this.selectColor, 30, 30); }, false);
 		this.fullSc.addEventListener('mouseout', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', '#787978', 30, 30); }, false);
 
 		var screenChange = function () {
 
 			_gui.isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? true : false;
-			fullSc.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', '#787978', 30, 30);
+			this.fullSc.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', '#787978', 30, 30);
 
 		};
 		document.addEventListener("fullscreenchange", this.screenChange, false);
@@ -566,11 +566,11 @@ class WGui {
 		this.bottomRight.appendChild(this.extra02);
 
 		this.extra01.addEventListener('click', function () { _gui.toggleExtraMode('shoot') }, false);
-		this.extra01.addEventListener('mouseover', function () { this.innerHTML = _gui.icon('shoot', selectColor, 30, 30); }, false);
+		this.extra01.addEventListener('mouseover', function () { this.innerHTML = _gui.icon('shoot', _gui.selectColor, 30, 30); }, false);
 		this.extra01.addEventListener('mouseout', function () { this.innerHTML = _gui.icon('shoot', _gui.extraMode === 'shoot' ? '#787978' : '#383938', 30, 30); }, false);
 
 		this.extra02.addEventListener('click', function () { _gui.toggleExtraMode('picker'); }, false);
-		this.extra02.addEventListener('mouseover', function () { this.innerHTML = _gui.icon('picker', selectColor, 30, 30); }, false);
+		this.extra02.addEventListener('mouseover', function () { this.innerHTML = _gui.icon('picker', _gui.selectColor, 30, 30); }, false);
 		this.extra02.addEventListener('mouseout', function () { this.innerHTML = _gui.icon('picker', _gui.extraMode === 'picker' ? '#787978' : '#383938', 30, 30); }, false);
 
 	}
@@ -581,7 +581,7 @@ class WGui {
 		this.extra01.innerHTML = this.icon('shoot', this.extraMode === 'shoot' ? '#787978' : '#383938', 30, 30);
 		this.extra02.innerHTML = this.icon('picker', this.extraMode === 'picker' ? '#787978' : '#383938', 30, 30);
 
-		modeCallBack(this.extraMode);
+		this.modeCallBack(this.extraMode);
 
 	}
 	initPauseBtn() {

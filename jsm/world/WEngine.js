@@ -3383,7 +3383,7 @@ class WorldEngine extends THREE.EventDispatcher {
 		this.gui.init();
 		this.user = WUser();
 		this.debugTell("初始化三维引擎...");
-		this.view = WView(this.loadingManager);
+		this.view = new WView(this.loadingManager);
 		this.physic = physic;
 		this.ddlsworld = new DDLSWorld(10, 10);
 
