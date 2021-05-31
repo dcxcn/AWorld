@@ -211,7 +211,8 @@ Object.assign( Vehicle.prototype, {
 
 	    } else {
 
-	        var g = new THREE.BufferGeometry().fromGeometry( new THREE.BoxGeometry( size[ 0 ], size[ 1 ], size[ 2 ] ) );//geo.box;
+	        //var g = new THREE.BufferGeometry().fromGeometry( new THREE.BoxGeometry( size[ 0 ], size[ 1 ], size[ 2 ] ) );//geo.box;
+			var g = new THREE.BoxGeometry( size[ 0 ], size[ 1 ], size[ 2 ] );//geo.box;
 	        g.translate( - o.massCenter[ 0 ], - o.massCenter[ 1 ], - o.massCenter[ 2 ] );
 	        root.extraGeo.push( g );
 	        mesh = new THREE.Mesh( g, root.mat.move );

@@ -2082,7 +2082,7 @@ class WorldEngine extends THREE.EventDispatcher {
 		object2.userData.lock = curO.lock;
 	}
 	create_car(curO) {
-		var confs = curO.conFunc(_engine);
+		var confs = curO.conFunc(this);
 		for (var i = 0, il = confs.length; i < il; i++) {
 			var carO = this.add(confs[i]);
 			this.addMoveObjName(carO.name);
