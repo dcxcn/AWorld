@@ -358,11 +358,11 @@ class WView {
 		return model;
 	}
 	getAnimations(name) {
-		return modelsCache[name].animations;
+		return this.modelsCache[name].animations;
 	}
 	getMMDAnimation(conf, object) {
 		if (object.isCamera) {
-			var camVmd = vmdCache[conf.refVMD];
+			var camVmd = this.vmdCache[conf.refVMD];
 			var cameras = camVmd.cameras;
 			for (var i = 0, il = cameras.length; i < il; i++) {
 
@@ -500,7 +500,7 @@ class WView {
 		//window.WEngine.updateMaterials();
 	}
 	setCameraFollowBehind(b) {
-		cameraFollowBehind = b;
+		this.cameraFollowBehind = b;
 	}
 	getMobile() {
 		var n = navigator.userAgent;
@@ -614,17 +614,17 @@ class WView {
 
 	removeRay() {
 
-		if (!isRay) return;
+		if (!this.isRay) return;
 
-		canvas.removeEventListener('mousemove', this.fray, false);
-		canvas.removeEventListener('mousedown', this.mDown, false);
+		this.canvas.removeEventListener('mousemove', this.fray, false);
+		this.canvas.removeEventListener('mousedown', this.mDown, false);
 		document.removeEventListener('mouseup', this.mUp, false);
 
 		this.rayCallBack = function () { };
 
 		this.removeVisual(this.dragPlane);
 
-		isRay = false;
+		this.isRay = false;
 		this.offset.set(0, 0, 0);
 
 	}

@@ -1,11 +1,12 @@
 import { Gui, add } from '../../jsm/libs/uil.module.js';
+import { ThreeBSP } from '../three/utils/ThreeBSP.js';
 
 class WGui {
 
 	constructor(o) {
 
 		// Constants
-		this.version = 'V20200504';
+		this.version = 'V210601';	
 		this.isTouch = !!('ontouchstart' in window);
 		this.isPointer = window.PointerEvent ? true : false;
 		this.isMSPointer = window.MSPointerEvent ? true : false;
@@ -263,7 +264,7 @@ class WGui {
 		else { window.WEngine.currentFollow.userData.avatar.model.visible = true; }
 	}
 	heroFollowBehind(b) {
-		isFollow = b;
+		this.isFollow = b;
 		window.WEngine.view.setCameraFollowBehind(b);
 	}
 	helperVisibility() {
@@ -486,7 +487,7 @@ class WGui {
 	}
 	basicMenu() {
 		this.ui.clear();
-		this.ui.add('title', { name: '调试面板', prefix: this.version, h: 20, r: 10 });
+		this.ui.add('title', { name: '调试面板【'+THREE.REVISION+'】', prefix: this.version, h: 20, r: 10 });
 		this.ui.add('fps', { height: 30 });
 		this.ui.add('button', { name: '隐藏', p: 70, h: 30, r: 10 }).onChange(function () { this.ui.hide(true); });
 		this.ui.add('bool', { name: '显示坐标轴', p: 70, h: 20, value: false }).onChange(this.axisHelperVisibility);

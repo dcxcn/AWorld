@@ -777,7 +777,7 @@ class WorldEngine extends THREE.EventDispatcher {
 	}
 
 	create_terrainc(curO) {
-
+		var _engine = this;
 		var o = {
 			type: 'terrain',
 			name: curO.name,
@@ -830,9 +830,9 @@ class WorldEngine extends THREE.EventDispatcher {
 				//type:hdata,hmap,harray
 				//var terrainSource = {type:'hmap',data:image};
 				var terrainSource = { type: 'hdata', data: o.hdata };
-				terrainData = new TerrainData(terrainPos, o.size[0], o.size[2], scaleZ, terrainSource, 1, o.sample[0], o.sample[1]);
+				_engine.terrainData = new TerrainData(terrainPos, o.size[0], o.size[2], scaleZ, terrainSource, 1, o.sample[0], o.sample[1]);
 				if (curO.hasOwnProperty("onTerrainObjects")) {
-					this.createOnTerrainObjects(curO, terrainPos, terrainData);
+					_engine.createOnTerrainObjects(curO, terrainPos, terrainData);
 				}
 
 				//terrainData 测试 碰撞测试
@@ -874,16 +874,16 @@ class WorldEngine extends THREE.EventDispatcher {
 				//g.computeVertexNormals();
 
 
-				var texture = new THREE.CanvasTexture(this.generateTexture(o.size[1], o.hdata, o.sample[0], o.sample[1], curO.colors));
+				var texture = new THREE.CanvasTexture(_engine.generateTexture(o.size[1], o.hdata, o.sample[0], o.sample[1], curO.colors));
 				texture.wrapS = THREE.ClampToEdgeWrapping;
 				texture.wrapT = THREE.ClampToEdgeWrapping;
-				extraGeo.push(g);
+				_engine.extraGeo.push(g);
 				var terrainMaterial = new THREE.MeshPhongMaterial({ map: texture });
 				BufferGeometryUtils.computeTangents(g);
 				var mesh = new THREE.Mesh(g, terrainMaterial);
 				mesh.userData = { maxH: o.size[1], hdata: o.hdata, width: o.sample[0], height: o.sample[1], colors: curO.colors };
 				mesh.updateMaterial = function (m) {
-					this.material.map.image = this.generateTexture(this.userData.maxH,
+					this.material.map.image = _engine.generateTexture(this.userData.maxH,
 						this.userData.hdata,
 						this.userData.width,
 						this.userData.height,
@@ -898,9 +898,9 @@ class WorldEngine extends THREE.EventDispatcher {
 				//mesh.visible = false;
 				mesh.castShadow = false;
 				mesh.receiveShadow = true;
-				terrains.push(mesh);
+				_engine.terrains.push(mesh);
 				o.mesh = mesh;
-				this.add(o);
+				_engine.add(o);
 
 			}
 		});
@@ -2615,21 +2615,21 @@ class WorldEngine extends THREE.EventDispatcher {
 				group: 1,
 				quat: [0, 0, 0]
 			};
-			this.add(o);
+			_engine.add(o);
 
 			if (co.hasOwnProperty("sounds")) {
-				this.addSound(_engine.view.audioListener, curAnimal.model.parent, co.sounds);
+				_engine.addSound(_engine.view.audioListener, curAnimal.model.parent, co.sounds);
 			}
-			heros.push(curAnimal.model.parent);
-			this.addMoveObjName(o.ename);
-			labels.push(curAnimal.addNameLabel());
+			_engine.heros.push(curAnimal.model.parent);
+			_engine.addMoveObjName(o.ename);
+			_engine.labels.push(curAnimal.addNameLabel());
 
 			var h = _engine.ddlsworld.addHeroe({ x: o.pos[0], y: o.pos[2], r: o.size[0], speed: 1 / 35 });
 			h.mesh = curAnimal.model.parent;
-			h.mesh.userData.index = this.ddlsHeros.length;
+			h.mesh.userData.index = _engine.ddlsHeros.length;
 			h.mesh.userData.findPath = false;
 			h.mesh.userData.findPathCallBack = function () { };
-			this.ddlsHeros.push(h);
+			_engine.ddlsHeros.push(h);
 		};
 		if (curO.positions) {
 			for (var i = 0; i < curO.positions.length; i++) {
