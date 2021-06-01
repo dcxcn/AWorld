@@ -294,7 +294,7 @@ class WView {
 			if (conf.isSet) _self.loadMeshes(modelO);
 			callback_load(modelO, conf);
 		} else {
-			fbxLoader.load(conf.url, function (fbx) {
+			this.fbxLoader.load(conf.url, function (fbx) {
 				const animsByName = {};
 				fbx.animations.forEach((clip) => {
 					animsByName[clip.name] = clip;
@@ -907,25 +907,25 @@ class WView {
 	}
 	enableHoloEffect(b, sideNum) {
 		if (b) {
-			renderType = sideNum;
+			this.renderType = sideNum;
 		} else {
-			renderType = 1;
+			this.renderType = 1;
 		}
 		this.onWindowResize();
 	}
 	enableVREffect(b) {
 		if (b) {
-			renderType = 2;
+			this.renderType = 2;
 		} else {
-			renderType = 1;
+			this.renderType = 1;
 		}
 		this.onWindowResize();
 	}
 	enableWebVREffect(b) {
 		if (b) {
-			renderType = 5;
+			this.renderType = 5;
 		} else {
-			renderType = 1;
+			this.renderType = 1;
 		}
 		this.onWindowResize();
 	}
