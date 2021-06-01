@@ -1866,4 +1866,4 @@ class Face3 {
 
 }
 
-export { Face3, Geometry };
+export { Face3, Geometry, DirectGeometry };

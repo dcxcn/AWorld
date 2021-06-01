@@ -538,6 +538,7 @@
 			{name:'aim_r_handgun',refBVH:'avatar_aim_R_handgun',speed:0.5,
 					freezebones:['Spine','LeftShoulder','RightShoulder','LeftArm','LeftForeArm','RightArm','RightForeArm','LeftHand','RightHand']}
 		]
+		
 	}],
     events: {
 		dbclick: [{

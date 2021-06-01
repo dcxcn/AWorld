@@ -2,6 +2,7 @@
 import { ConvexHull } from './ConvexHull.js';
 import { BufferGeometryUtils } from '../../three/utils/BufferGeometryUtils.js';
 import {
+    BufferAttribute,
 	BufferGeometry,
 	Matrix4,
 	SphereGeometry,
@@ -10,6 +11,7 @@ import {
 } from "../../libs/three.module.js";
 import {
 	Geometry,
+    DirectGeometry
 } from "../../three/deprecated/Geometry.js";
 export function geometryInfo( g, type ) {
 
@@ -185,53 +187,140 @@ function mapIndices( bufGeometry, indexedBufferGeom ) {
 * CAPSULE GEOMETRY
 */
 
-function Capsule ( radius, height, radialSegs, heightSegs) {
+class Capsule extends BufferGeometry{
 		
-	this.type = 'Capsule';
 
-    radius = radius || 1;
-    height = height || 1;
+    constructor( radius, height, radialSegs, heightSegs) {
+        super();
+        this.type = 'Capsule';
 
-    var pi = Math.PI;
+        radius = radius || 1;
+        height = height || 1;
 
-    radialSegs = Math.floor( radialSegs ) || 12;
-    var sHeight = Math.floor( radialSegs * 0.5 );
+        var pi = Math.PI;
 
-    heightSegs = Math.floor( heightSegs ) || 1;
-    var o0 = Math.PI * 2;
-    var o1 = Math.PI * 0.5;
-    var g = new Geometry();
-    var m0 = new Geometry().fromBufferGeometry(new CylinderGeometry( radius, radius, height, radialSegs, heightSegs, true ));
+        radialSegs = Math.floor( radialSegs ) || 12;
+        var sHeight = Math.floor( radialSegs * 0.5 );
 
-    var mr = new Matrix4();
-    var m1 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, 0, o1));
-    var m2 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, o1, o1));
-    var mtx0 = new Matrix4().makeTranslation( 0,0,0 );
-	if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
-    //if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
-    var mtx1 = new Matrix4().makeTranslation(0, height*0.5,0);
-    var mtx2 = new Matrix4().makeTranslation(0, -height*0.5,0);
-    mr.makeRotationZ( pi );
-    g.merge( m0, mtx0.multiply(mr) );
-    g.merge( m1, mtx1);
-    g.merge( m2, mtx2);
+        heightSegs = Math.floor( heightSegs ) || 1;
+        var o0 = Math.PI * 2;
+        var o1 = Math.PI * 0.5;
+        var g = new Geometry();
+        var m0 = new Geometry().fromBufferGeometry(new CylinderGeometry( radius, radius, height, radialSegs, heightSegs, true ));
 
-    g.mergeVertices();
-    g.computeVertexNormals();
+        var mr = new Matrix4();
+        var m1 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, 0, o1));
+        var m2 = new Geometry().fromBufferGeometry(new SphereGeometry( radius, radialSegs, sHeight, 0, o0, o1, o1));
+        var mtx0 = new Matrix4().makeTranslation( 0,0,0 );
+        if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
+        //if(radialSegs===6) mtx0.makeRotationY( 30 * THREE.Math.DEG2RAD );
+        var mtx1 = new Matrix4().makeTranslation(0, height*0.5,0);
+        var mtx2 = new Matrix4().makeTranslation(0, -height*0.5,0);
+        mr.makeRotationZ( pi );
+        g.merge( m0, mtx0.multiply(mr) );
+        g.merge( m1, mtx1);
+        g.merge( m2, mtx2);
 
-    m0.dispose();
-    m1.dispose();
-    m2.dispose();
-	
-	var bfgeo = Geometry.createBufferGeometryFromObject(g);
+        g.mergeVertices();
+        g.computeVertexNormals();
+
+        m0.dispose();
+        m1.dispose();
+        m2.dispose();
+        
+
+        const geometry = new DirectGeometry().fromGeometry( g );
 
 
-    g.dispose();
-	return bfgeo;
+		const positions = new Float32Array( geometry.vertices.length * 3 );
+		this.setAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+
+		if ( geometry.normals.length > 0 ) {
+
+			const normals = new Float32Array( geometry.normals.length * 3 );
+			this.setAttribute( 'normal', new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		}
+
+		if ( geometry.colors.length > 0 ) {
+
+			const colors = new Float32Array( geometry.colors.length * 3 );
+			this.setAttribute( 'color', new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+
+		}
+
+		if ( geometry.uvs.length > 0 ) {
+
+			const uvs = new Float32Array( geometry.uvs.length * 2 );
+			this.setAttribute( 'uv', new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+
+		}
+
+		if ( geometry.uvs2.length > 0 ) {
+
+			const uvs2 = new Float32Array( geometry.uvs2.length * 2 );
+			this.setAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
+
+		}
+
+		// groups
+
+		this.groups = geometry.groups;
+
+		// morphs
+
+		for ( const name in geometry.morphTargets ) {
+
+			const array = [];
+			const morphTargets = geometry.morphTargets[ name ];
+
+			for ( let i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+				const morphTarget = morphTargets[ i ];
+
+				const attribute = new Float32BufferAttribute( morphTarget.data.length * 3, 3 );
+				attribute.name = morphTarget.name;
+
+				array.push( attribute.copyVector3sArray( morphTarget.data ) );
+
+			}
+
+			this.morphAttributes[ name ] = array;
+
+		}
+
+		// skinning
+
+		if ( geometry.skinIndices.length > 0 ) {
+
+			const skinIndices = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
+			this.setAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+
+		}
+
+		if ( geometry.skinWeights.length > 0 ) {
+
+			const skinWeights = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
+			this.setAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+
+		}
+
+		//
+
+		if ( geometry.boundingSphere !== null ) {
+
+			this.boundingSphere = geometry.boundingSphere.clone();
+
+		}
+
+		if ( geometry.boundingBox !== null ) {
+
+			this.boundingBox = geometry.boundingBox.clone();
+
+		}
+    }
 
 }
-
-Capsule.prototype = Object.create( BufferGeometry.prototype );
 
 export { Capsule };
 

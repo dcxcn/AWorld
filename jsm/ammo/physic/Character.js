@@ -156,8 +156,7 @@ Object.assign( Character.prototype, {
 	    var mesh = new THREE.Group();//o.mesh || new THREE.Mesh( g );
 		mesh.ename = name;	
 	    if ( o.debug ) {
-
-	        var mm = new THREE.Mesh( g, root.mat.debug );
+	        var mm = new THREE.Mesh( g, root.mat.kinect );
 	        root.extraGeo.push( g );
 			mm.visible = false;
 	        mesh.add( mm );

@@ -1909,6 +1909,22 @@ class WorldEngine extends THREE.EventDispatcher {
 			material: curO.material
 		});
 	}
+	create_capsule(curO) {
+		this.add({
+			type: 'capsule',
+			name: curO.name || Math.generateUUID(),
+			roadblock: curO.roadblock,
+			size: [curO.radius],
+			mass: curO.mass,
+			pos: curO.position,
+			sounds: curO.sounds || null,
+			group: curO.group || 1,
+			state: 4,
+			friction: 0.4,
+			restitution: 0.9,
+			material: curO.material
+		});
+	}
 	create_convex(curO) {
 		this.add({
 			type: 'convex',

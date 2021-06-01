@@ -264,6 +264,7 @@
 		cname: '老大',		
 		position :[3,1,3],
 		physicBody: true,
+		debug: true,
 		sounds:{
 			data:{
 				addbullet:{name:'addbullet',loop:false,refdistance:5},
