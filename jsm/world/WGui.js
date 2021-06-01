@@ -537,7 +537,7 @@ class WGui {
 			}
 		};
 		this.fullSc.addEventListener('click', toggleFullScreen, false);
-		this.fullSc.addEventListener('mouseover', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', this.selectColor, 30, 30); }, false);
+		this.fullSc.addEventListener('mouseover', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', _gui.selectColor, 30, 30); }, false);
 		this.fullSc.addEventListener('mouseout', function () { this.innerHTML = _gui.icon(!_gui.isFullScreen ? 'scrIn' : 'scrOut', '#787978', 30, 30); }, false);
 
 		var screenChange = function () {
