@@ -20,1193 +20,1184 @@ import { root, map, REVISION } from '../ammo/physic/root.js';
 *    update by dcxcn
 */
 
-export var physic = ( function () {
+class WPhysic {
+	constructor() {
+		this.type = 'LZMA'; // LZMA / WASM / ASM
 
-	'use strict';
+		this.worker = null;
+		this.callback = null;
+		this.blob = null;
 
-	var type = 'LZMA'; // LZMA / WASM / ASM
+		this.URL = window.URL || window.webkitURL;
+		this.Time = typeof performance === 'undefined' ? Date : performance;
+		this.t = { now: 0, delta: 0, then: 0, deltaTime: 0, inter: 0, tmp: 0, n: 0, timerate: 0, steptime: 0 };
 
-	var worker, callback, blob = null;
+		this.timer = null;
 
-	var URL = window.URL || window.webkitURL;
-	var Time = typeof performance === 'undefined' ? Date : performance;
-	var t = { now: 0, delta: 0, then: 0, deltaTime:0, inter: 0, tmp: 0, n: 0, timerate: 0, steptime: 0 };
+		this.isBuffer = false;
+		this.isPause = false;
+		this.stepNext = false;
 
-	var timer = null;
+		this.currentMode = '';
+		this.oldMode = '';
 
-	var isBuffer = false;
-	var isPause = false;
-	var stepNext = false;
+		this.PI90 = Math.PI * 0.5;
+		this.torad = Math.PI / 180;
+		this.todeg = 180 / Math.PI;
 
-	var currentMode = '';
-	var oldMode = '';
+		this.rigidBody = null;
+		this.softBody = null;
+		this.terrains = null;
+		this.vehicles = null;
+		this.character = null;
+		this.collision = null;
+		this.rayCaster = null;
+		this.constraint = null;
 
-	var PI90 = Math.PI * 0.5;
-	var torad = Math.PI / 180;
-	var todeg = 180 / Math.PI;
+		this.convexBreaker = null;
+		this.ray = null;
+		this.mouseMode = 'free';
 
-	var rigidBody, softBody, terrains, vehicles, character, collision, rayCaster, constraint;
+		this.tmpRemove = [];
+		this.tmpAdd = [];
 
-	var convexBreaker = null;
-	var ray = null;
-	var mouseMode = 'free';
+		this.oldFollow = '';
 
-	var tmpRemove = [];
-	var tmpAdd = [];
+		this.stats = { skip: 0, };
 
-	var oldFollow = '';
+		this.isInternUpdate = false;
+		//this.isRequestAnimationFrame = false;
 
-	var stats = { skip : 0, };
+		this.option = {
 
-	var isInternUpdate = false;
-	//var isRequestAnimationFrame = false;
+			worldscale: 1,
+			gravity: [0, - 9.8, 0],
+			fps: 60,
 
-	var option = {
+			substep: 2,
+			broadphase: 2,
+			soft: true,
 
-		worldscale: 1,
-		gravity: [ 0, - 9.8, 0 ],
-		fps: 60,
+			animFrame: true,
+			fixed: true,
+			jointDebug: false,
 
-		substep: 2,
-		broadphase: 2,
-		soft: true,
+		};
+		this.folder = './js/libs/';
+	}
 
-		animFrame : true,
-		fixed: true,
-		jointDebug: false,
+	message(e) {
 
-	};
+		var data = e.data;
+		if (data.Ar) root.Ar = data.Ar;
+		if (data.flow) root.flow = data.flow;
 
-	return {
+		switch (data.m) {
 
-		folder: './js/libs/',
+			case 'initEngine': this.initEngine(); break;
+			case 'start': this.start(); break;
+			case 'step': this.step(data.fps, data.delta); break;
 
-		message: function ( e ) {
+			case 'moveSolid': this.moveSolid(data.o); break;
+			case 'ellipsoid': this.ellipsoidMesh(data.o); break;
 
-			var data = e.data;
-			if ( data.Ar ) root.Ar = data.Ar;
-			if ( data.flow ) root.flow = data.flow;
+			case 'makeBreak': this.makeBreak(data.o); break;
 
-			switch ( data.m ) {
+		}
 
-				case 'initEngine': physic.initEngine(); break;
-				case 'start': physic.start(); break;
-				case 'step': physic.step(data.fps, data.delta); break;
+	}
+	init(Callback, Type, Option, Counts) {
 
-				case 'moveSolid': physic.moveSolid( data.o ); break;
-				case 'ellipsoid': physic.ellipsoidMesh( data.o ); break;
+		this.initArray(Counts);
+		this.defaultRoot();
 
-				case 'makeBreak': physic.makeBreak( data.o ); break;
+		Option = Option || {};
 
-			}
+		this.callback = Callback;
 
-		},
+		this.isInternUpdate = Option.use_intern_update || false;
 
-		init: function ( Callback, Type, Option, Counts ) {
+		this.option = {
 
-			this.initArray( Counts );
-			this.defaultRoot();
+			fps: Option.fps || 60,
+			worldscale: Option.worldscale || 1,
+			gravity: Option.gravity || [0, - 9.8, 0],
+			substep: Option.substep || 2,
+			broadphase: Option.broadphase || 2,
+			soft: Option.soft !== undefined ? Option.soft : true,
+			//penetration: Option.penetration || 0.0399,
 
-			Option = Option || {};
+			fixed: Option.fixed !== undefined ? Option.fixed : true,
+			animFrame: Option.animFrame !== undefined ? Option.animFrame : true,
 
-			callback = Callback;
+			jointDebug: Option.jointDebug !== undefined ? Option.jointDebug : false,
 
-			isInternUpdate = Option.use_intern_update || false;
+			isInternUpdate: this.isInternUpdate,
 
-			option = {
+		};
 
-				fps: Option.fps || 60,
-				worldscale: Option.worldscale || 1,
-				gravity: Option.gravity || [ 0, - 9.8, 0 ],
-				substep: Option.substep || 2,
-				broadphase: Option.broadphase || 2,
-				soft: Option.soft !== undefined ? Option.soft : true,
-				//penetration: Option.penetration || 0.0399,
+		this.t.timerate = (1 / this.option.fps) * 1000;
+		//t.autoFps = option.autoFps;
 
-				fixed: Option.fixed !== undefined ? Option.fixed : true,
-				animFrame: Option.animFrame !== undefined ? Option.animFrame : true,
+		this.type = Type || 'LZMA';
 
-				jointDebug : Option.jointDebug !== undefined ? Option.jointDebug : false,
+		switch (this.type) {
 
-				isInternUpdate: isInternUpdate,
-
-			};
-
-			t.timerate = ( 1 / option.fps ) * 1000;
-			//t.autoFps = option.autoFps;
-
-			type = Type || 'LZMA';
-
-			switch( type ) {
-
-				case 'min' : 
-				    physic.load( physic.folder + "ammo.hex", true );
+			case 'min':
+				this.load(this.folder + "ammo.hex", true);
 				break;
 
-				case 'LZMA' : case 'lzma' : case 'compact' :
-				    physic.load( physic.folder + "ammo.hex" );
+			case 'LZMA': case 'lzma': case 'compact':
+				this.load(this.folder + "ammo.hex");
 				break;
 
-				case 'WASM': case 'wasm':
-				    blob = document.location.href.replace( /\/[^/]*$/, "/" ) + physic.folder + "ammo.wasm.js";
-				    physic.startWorker();
+			case 'WASM': case 'wasm':
+				this.blob = document.location.href.replace(/\/[^/]*$/, "/") + this.folder + "ammo.wasm.js";
+				this.startWorker();
 				break;
 
-				case 'BASIC': case 'basic':
-				    blob = document.location.href.replace( /\/[^/]*$/, "/" ) + physic.folder + "ammo.js";
-				    physic.startWorker();
+			case 'BASIC': case 'basic':
+				this.blob = document.location.href.replace(/\/[^/]*$/, "/") + this.folder + "ammo.js";
+				this.startWorker();
 				break;
 
-			}
+		}
 
-		},
+	}
 
-		set: function ( o ) {
+	set(o) {
 
-			o = o || option;
-			t.timerate = o.fps !== undefined ? ( 1 / o.fps ) * 1000 : t.timerate;
-			//t.autoFps = o.autoFps !== undefined ? o.autoFps : false;
+		o = o || this.option;
+		this.t.timerate = o.fps !== undefined ? (1 / o.fps) * 1000 : this.t.timerate;
+		//t.autoFps = o.autoFps !== undefined ? o.autoFps : false;
 
-			option.fixed = o.fixed || false;
-			option.animFrame = o.animFrame || false;
-			option.jointDebug = o.jointDebug || false;
+		this.option.fixed = o.fixed || false;
+		this.option.animFrame = o.animFrame || false;
+		this.option.jointDebug = o.jointDebug || false;
 
-			o.isInternUpdate = isInternUpdate;
+		o.isInternUpdate = this.isInternUpdate;
 
-			root.constraintDebug = option.jointDebug;
+		root.constraintDebug = this.option.jointDebug;
 
-			this.post( 'set', o );
+		this.post('set', o);
 
-		},
+	}
 
-		load: function ( link, isMin ) {
+	load(link, isMin) {
 
-			var xhr = new XMLHttpRequest();
-			xhr.responseType = "arraybuffer";
-			xhr.open( 'GET', link, true );
+		var physic = this;
+		var xhr = new XMLHttpRequest();
+		xhr.responseType = "arraybuffer";
+		xhr.open('GET', link, true);
 
-			xhr.onreadystatechange = function () {
+		xhr.onreadystatechange = function () {
 
-				if ( xhr.readyState === 4 ) {
+			if (xhr.readyState === 4) {
 
-					if ( xhr.status === 200 || xhr.status === 0 ) {
+				if (xhr.status === 200 || xhr.status === 0) {
 
-						blob = URL.createObjectURL( new Blob( [ LZMAdecompact( xhr.response ) ], { type: 'application/javascript' } ) );
-						physic.startWorker( isMin );
+					physic.blob = URL.createObjectURL(new Blob([LZMAdecompact(xhr.response)], { type: 'application/javascript' }));
+					physic.startWorker(isMin);
 
-					} else {
+				} else {
 
-						console.error( "Couldn't load [" + link + "] [" + xhr.status + "]" );
-
-					}
+					console.error("Couldn't load [" + link + "] [" + xhr.status + "]");
 
 				}
 
-			};
+			}
 
-			xhr.send( null );
+		};
 
-		},
+		xhr.send(null);
 
-		startWorker: function ( isMin ) {
+	}
 
-			isMin = isMin || false;
+	startWorker(isMin) {
 
-			//blob = document.location.href.replace(/\/[^/]*$/,"/") + "./build/ammo.js" ;
+		isMin = isMin || false;
 
-			//worker = new Worker( physic.folder + (isMin ? 'gun.min.js' : 'gun.js') );
-			worker = new Worker( physic.folder + 'ammowker.js');
-			worker.postMessage = worker.webkitPostMessage || worker.postMessage;
-			worker.onmessage = physic.message;
+		//this.blob = document.location.href.replace(/\/[^/]*$/,"/") + "./build/ammo.js" ;
 
-			// test transferrables
-			var ab = new ArrayBuffer( 1 );
-			worker.postMessage( { m: 'test', ab: ab }, [ ab ] );
-			isBuffer = ab.byteLength ? false : true;
+		//this.worker = new Worker( this.folder + (isMin ? 'gun.min.js' : 'gun.js') );
+		this.worker = new Worker(this.folder + 'ammowker.js');
+		this.worker.postMessage = this.worker.webkitPostMessage || this.worker.postMessage;
+		this.worker.onmessage = this.message.bind(this);
 
-			if( isInternUpdate ) isBuffer = false;
+		// test transferrables
+		var ab = new ArrayBuffer(1);
+		this.worker.postMessage({ m: 'test', ab: ab }, [ab]);
+		this.isBuffer = ab.byteLength ? false : true;
 
-			// start physic worker
-			physic.post( 'init', { blob: blob, ArPos: root.ArPos, ArMax: root.ArMax, isBuffer: isBuffer, option: option } );
-			root.post = physic.post;
+		if (this.isInternUpdate) this.isBuffer = false;
 
-		},
+		// start physic worker
+		this.post('init', { blob: this.blob, ArPos: root.ArPos, ArMax: root.ArMax, isBuffer: this.isBuffer, option: this.option });
+		root.post = this.post.bind(this);
 
-		initArray: function ( Counts ) {
+	}
 
-			Counts = Counts || {};
+	initArray(Counts) {
 
-			var counts = {
-				maxBody: Counts.maxBody || 1400,
-				maxContact: Counts.maxContact || 200,
-				maxCharacter: Counts.maxCharacter || 10,
-				maxCar: Counts.maxCar || 14,
-				maxSoftPoint: Counts.maxSoftPoint || 8192,
-				maxJoint: Counts.maxJoint || 1000,
-			};
+		Counts = Counts || {};
 
-			root.ArLng = [
-				counts.maxBody * 8, // rigidbody
-				counts.maxContact, // contact
-				counts.maxCharacter * 8, // hero
-				counts.maxCar * 64, // cars
-				counts.maxSoftPoint * 3, // soft point
-				counts.maxJoint * 14, // joint point
-			];
+		var counts = {
+			maxBody: Counts.maxBody || 1400,
+			maxContact: Counts.maxContact || 200,
+			maxCharacter: Counts.maxCharacter || 10,
+			maxCar: Counts.maxCar || 14,
+			maxSoftPoint: Counts.maxSoftPoint || 8192,
+			maxJoint: Counts.maxJoint || 1000,
+		};
 
-			root.ArPos = [
-				0,
-				root.ArLng[ 0 ],
-				root.ArLng[ 0 ] + root.ArLng[ 1 ],
-				root.ArLng[ 0 ] + root.ArLng[ 1 ] + root.ArLng[ 2 ],
-				root.ArLng[ 0 ] + root.ArLng[ 1 ] + root.ArLng[ 2 ] + root.ArLng[ 3 ],
-				root.ArLng[ 0 ] + root.ArLng[ 1 ] + root.ArLng[ 2 ] + root.ArLng[ 3 ] + root.ArLng[ 4 ],
-			];
+		root.ArLng = [
+			counts.maxBody * 8, // rigidbody
+			counts.maxContact, // contact
+			counts.maxCharacter * 8, // hero
+			counts.maxCar * 64, // cars
+			counts.maxSoftPoint * 3, // soft point
+			counts.maxJoint * 14, // joint point
+		];
 
-			root.ArMax = root.ArLng[ 0 ] + root.ArLng[ 1 ] + root.ArLng[ 2 ] + root.ArLng[ 3 ] + root.ArLng[ 4 ] + root.ArLng[ 5 ];
+		root.ArPos = [
+			0,
+			root.ArLng[0],
+			root.ArLng[0] + root.ArLng[1],
+			root.ArLng[0] + root.ArLng[1] + root.ArLng[2],
+			root.ArLng[0] + root.ArLng[1] + root.ArLng[2] + root.ArLng[3],
+			root.ArLng[0] + root.ArLng[1] + root.ArLng[2] + root.ArLng[3] + root.ArLng[4],
+		];
 
-		},
+		root.ArMax = root.ArLng[0] + root.ArLng[1] + root.ArLng[2] + root.ArLng[3] + root.ArLng[4] + root.ArLng[5];
 
-		initEngine: function () {
+	}
 
-			URL.revokeObjectURL( blob );
-			blob = null;
+	initEngine() {
 
-			this.initObject();
+		URL.revokeObjectURL(this.blob);
+		this.blob = null;
 
-			console.log( 'WPhysic ' + REVISION + ' | '+ ( isBuffer ? 'buffer' : 'no buffer' ) + ' | ' + type );
+		this.initObject();
 
-			if ( callback ) callback();
+		console.log('WPhysic ' + REVISION + ' | ' + (this.isBuffer ? 'buffer' : 'no buffer') + ' | ' + this.type);
 
-		},
+		if (this.callback) this.callback();
 
-		start: function ( noAutoUpdate ) {
+	}
 
-			if( isPause ) return;
+	start(noAutoUpdate) {
 
-			physic.stop();
+		if (this.isPause) return;
 
-			//console.log('start', t.timerate );
+		this.stop();
 
-			stepNext = true;
+		//console.log('start', t.timerate );
 
-			// create tranfere array if buffer
-			if ( isBuffer ) root.Ar = new Float32Array( root.ArMax );
+		this.stepNext = true;
 
-			//physic.sendData( 0 );
+		// create tranfere array if buffer
+		if (this.isBuffer) root.Ar = new Float32Array(root.ArMax);
 
-			t.then = Time.now();
+		//physic.sendData( 0 );
+
+		this.t.then = this.Time.now();
 
 
 
-			if( !noAutoUpdate && !isInternUpdate ){
+		if (!noAutoUpdate && !this.isInternUpdate) {
 
-				timer = option.animFrame ? requestAnimationFrame( physic.sendData ) : setInterval(  function(){ physic.sendData() }, t.timerate );
+			this.timer = this.option.animFrame ? requestAnimationFrame(this.sendData.bind(this)) : setInterval(function () { this.sendData.bind(this)() }, this.t.timerate);
 
-				//console.log( option.animFrame )
+			//console.log( option.animFrame )
+
+		}
+
+		if (!noAutoUpdate && this.isInternUpdate) { //physic.sendStep();
+			var key = this.getKey();
+			this.worker.postMessage({ m: 'internStep', o: { steptime: this.t.steptime, key: key }, flow: root.flow, Ar: root.Ar });
+		}
+
+		// test ray
+		this.setMode(this.oldMode);
+
+	}
+
+	prevUpdate() { }
+	postUpdate() { }
+	pastUpdate() { }
+
+	update() {
+
+		this.postUpdate(this.t.delta);
+
+		this.rigidBody.step(root.Ar, root.ArPos[0]);
+		this.collision.step(root.Ar, root.ArPos[1]);
+		this.character.step(root.Ar, root.ArPos[2]);
+		this.vehicles.step(root.Ar, root.ArPos[3]);
+		this.softBody.step(root.Ar, root.ArPos[4]);
+		this.constraint.step(root.Ar, root.ArPos[5]);
+
+		this.terrains.step();
+
+		this.rayCaster.step();
+
+		this.pastUpdate(this.t.delta);
+
+	}
+	step(fps, delta) {
+
+
+		//t.now = Time.now();
+
+		//var start = Time.now();
+
+
+		if (this.isInternUpdate) {
+			this.t.fps = fps;
+			this.t.delta = delta
+		} else {
+			//t.now = Time.now();
+			if (this.t.now - 1000 > this.t.tmp) { this.t.tmp = this.t.now; this.t.fps = this.t.n; this.t.n = 0; } this.t.n++; // FPS
+		}
+
+
+
+
+
+		this.tell();
+
+		this.update();
+
+
+		//if ( root.controler ) root.controler.follow();
+
+
+		this.stepRemove();
+		this.stepAdd();
+
+
+
+		//t.steptime = (Time.now() - t.now) * 0.001; // millisecond
+
+
+		this.stepNext = true;
+
+
+		if (this.isInternUpdate) { this.sendStep(); }
+
+
+
+	}
+
+	sendData(stamp) {
+
+		if (this.isInternUpdate) return;
+
+		if (root.refView) if (root.refView.pause) { this.stop(); return; }
+
+		if (this.option.animFrame) {
+
+			this.timer = requestAnimationFrame(this.sendData.bind(this));
+			//if ( !stepNext ) return;
+			this.t.now = stamp === undefined ? this.Time.now() : stamp;
+			this.t.deltaTime = this.t.now - this.t.then;
+			this.t.delta = this.t.deltaTime * 0.001;
+
+			if (this.t.deltaTime > this.t.timerate) {
+
+				this.t.then = this.t.now - (this.t.deltaTime % this.t.timerate);
+
+				this.sendStep();
 
 			}
 
-			if( !noAutoUpdate && isInternUpdate ){ //physic.sendStep();
-				var key = physic.getKey();
-				worker.postMessage( { m: 'internStep', o: {  steptime:t.steptime, key:key }, flow: root.flow, Ar: root.Ar } );
-			}
 
-			// test ray
-			physic.setMode( oldMode );
+		} else {
 
-		},
+			if (!this.stepNext) { this.stats.skip++; return; }
 
-		prevUpdate: function () {},
-		postUpdate: function () {},
-		pastUpdate: function () {},
+			//t.delta = ( t.now - Time.now() ) * 0.001;
 
-		update: function () {
-
-			physic.postUpdate( t.delta );
-
-			rigidBody.step( root.Ar, root.ArPos[ 0 ] );
-			collision.step( root.Ar, root.ArPos[ 1 ] );
-			character.step( root.Ar, root.ArPos[ 2 ] );
-			vehicles.step( root.Ar, root.ArPos[ 3 ] );
-			softBody.step( root.Ar, root.ArPos[ 4 ] );
-			constraint.step( root.Ar, root.ArPos[ 5 ] );
-
-			terrains.step();
-
-			rayCaster.step();
-
-			physic.pastUpdate( t.delta );
-
-		},
-
-		step: function ( fps, delta ) {
-
+			this.t.delta = (this.t.now - this.t.then) * 0.001;
+			this.t.then = this.t.now;
 
 			//t.now = Time.now();
-
-			//var start = Time.now();
-
-
-			if( isInternUpdate ){
-				t.fps = fps;
-				t.delta = delta 
-			} else {
-			    //t.now = Time.now();
-				if ( t.now - 1000 > t.tmp ) { t.tmp = t.now; t.fps = t.n; t.n = 0; } t.n ++; // FPS
-			}
-
-			
-
-			
-
-			physic.tell();
-
-			physic.update();
-			
-
-			//if ( root.controler ) root.controler.follow();
-			
-			
-			physic.stepRemove();
-        	physic.stepAdd();
-
-
-
-        	//t.steptime = (Time.now() - t.now) * 0.001; // millisecond
-
-        	
-            stepNext = true;
-
-
-			if( isInternUpdate ){ physic.sendStep(); }
-
-			
-
-		},
-
-		sendData: function ( stamp ) {
-
-			if( isInternUpdate ) return;
-
-			if ( root.refView ) if ( root.refView.pause ) { physic.stop(); return; }
-        	
-        	if( option.animFrame ){
-
-        		timer = requestAnimationFrame( physic.sendData );
-        		//if ( !stepNext ) return;
-        		t.now = stamp === undefined ? Time.now() : stamp;
-        		t.deltaTime = t.now - t.then;
-        		t.delta = t.deltaTime * 0.001;
-
-        		if ( t.deltaTime > t.timerate ){
-
-        			t.then = t.now - ( t.deltaTime % t.timerate );
-        				
-        			physic.sendStep();
-        			
-        		}
-        		
-
-        	} else {
-
-        		if ( !stepNext ){ stats.skip++; return; }
-
-        		//t.delta = ( t.now - Time.now() ) * 0.001;
-
-        		t.delta = ( t.now - t.then ) * 0.001;
-        		t.then = t.now;
-
-        		//t.now = Time.now();
-			    //t.delta = ( t.now - t.then ) * 0.001;
-
-			    //t.delta -= t.steptime;
-
-			    //console.log(t.delta)
-        	    //t.then = t.now;
-        	    //
-
-        	    physic.sendStep();
-
-        	}
-
-
-		},
-
-		sendStep: function () {
-
-			if ( !stepNext ) return;
-
-			t.now = Time.now();
 			//t.delta = ( t.now - t.then ) * 0.001;
+
+			//t.delta -= t.steptime;
+
+			//console.log(t.delta)
 			//t.then = t.now;
+			//
 
-			physic.prevUpdate( t.delta );
+			this.sendStep();
 
-			var key = physic.getKey();
+		}
 
-        	// timeStep < maxSubSteps * fixedTimeStep if you don't want to lose time.
 
-        	if( isInternUpdate ) {
+	}
 
-        		if ( isBuffer ) worker.postMessage( { m: 'internStep', o: { steptime:t.steptime,  key:key }, flow: root.flow, Ar: root.Ar }, [ root.Ar.buffer ] );
-			    //else worker.postMessage( { m: 'internStep', o: {  steptime:t.steptime, key:key }, flow: root.flow, Ar: root.Ar } );
+	sendStep() {
 
-        	} else {
+		if (!this.stepNext) return;
 
-        		if ( isBuffer ) worker.postMessage( { m: 'step', o: { delta: t.delta, key:key }, flow: root.flow, Ar: root.Ar }, [ root.Ar.buffer ] );
-			    else worker.postMessage( { m: 'step', o: { delta: t.delta, key:key }, flow: root.flow, Ar: root.Ar } );
+		this.t.now = this.Time.now();
+		//t.delta = ( t.now - t.then ) * 0.001;
+		//t.then = t.now;
 
-        	}
+		this.prevUpdate(this.t.delta);
 
-        	
+		var key = this.getKey();
 
-			stepNext = false;
+		// timeStep < maxSubSteps * fixedTimeStep if you don't want to lose time.
 
-		},
+		if (this.isInternUpdate) {
 
-		simpleStep: function (delta) {
+			if (this.isBuffer) this.worker.postMessage({ m: 'internStep', o: { steptime: this.t.steptime, key: key }, flow: root.flow, Ar: root.Ar }, [root.Ar.buffer]);
+			//else worker.postMessage( { m: 'internStep', o: {  steptime:t.steptime, key:key }, flow: root.flow, Ar: root.Ar } );
 
-			var key = physic.getKey();
-			worker.postMessage( { m: 'step', o: { delta: delta, key:key } } );
+		} else {
 
-		},
+			if (this.isBuffer) this.worker.postMessage({ m: 'step', o: { delta: this.t.delta, key: key }, flow: root.flow, Ar: root.Ar }, [root.Ar.buffer]);
+			else this.worker.postMessage({ m: 'step', o: { delta: this.t.delta, key: key }, flow: root.flow, Ar: root.Ar });
 
-		
+		}
 
-		/////////
 
-		stepRemove: function () {
 
-			if( tmpRemove.length === 0 ) return;
-			this.post( 'setRemove', tmpRemove );
-			while ( tmpRemove.length > 0 ) this.remove( tmpRemove.pop(), true );
+		this.stepNext = false;
 
-		},
+	}
 
-		stepAdd: function () {
+	simpleStep(delta) {
 
-			if( tmpAdd.length === 0 ) return;
-			//this.post( 'setAdd', tmpAdd );
-			while ( tmpAdd.length > 0 ) this.add( tmpAdd.shift() );
+		var key = this.getKey();
+		this.worker.postMessage({ m: 'step', o: { delta: delta, key: key } });
 
-		},
+	}
+	/////////
 
-		setView: function ( v ) {
-			root.refView = v;
-			root.mat = Object.assign( {}, root.mat, v.getMat() );
-			root.geo = Object.assign( {}, root.geo, v.getGeo() );//v.getGeo();
-			root.container = v.getContent();
-			root.controler = v.getControler();
+	stepRemove() {
 
-			root.isRefView = true;
+		if (this.tmpRemove.length === 0) return;
+		this.post('setRemove', this.tmpRemove);
+		while (this.tmpRemove.length > 0) this.remove(this.tmpRemove.pop(), true);
 
-			//if( isInternUpdate ) root.refView.updateIntern = physic.update;
+	}
 
-		},
+	stepAdd() {
 
-		getFps: function () { return t.fps; },
-		getDelta: function () { return t.delta; },
-		getIsFixed: function () { return option.fixed; },
-		getKey: function () { return [ 0, 0, 0, 0, 0, 0, 0, 0 ]; },
+		if (this.tmpAdd.length === 0) return;
+		//this.post( 'setAdd', tmpAdd );
+		while (this.tmpAdd.length > 0) this.add(this.tmpAdd.shift());
 
-		tell: function () {},
-		log: function () {},
+	}
 
+	setView(v) {
+		root.refView = v;
+		root.mat = Object.assign({}, root.mat, v.getMat());
+		root.geo = Object.assign({}, root.geo, v.getGeo());//v.getGeo();
+		root.container = v.getContent();
+		root.controler = v.getControler();
 
-		
+		root.isRefView = true;
 
-		post: function ( m, o ) {
+		//if( isInternUpdate ) root.refView.updateIntern = physic.update;
 
-			worker.postMessage( { m:m, o:o } );
+	}
 
-		},
+	getFps() { return this.t.fps; }
+	getDelta() { return this.t.delta; }
+	getIsFixed() { return this.option.fixed; }
+	getKey() { return [0, 0, 0, 0, 0, 0, 0, 0]; }
 
-		reset: function ( full ) {
+	tell() { }
+	log() { }
+	post(m, o) {
 
-			stats.skip = 0;
+		this.worker.postMessage({ m: m, o: o });
 
-			//console.log('reset', full);
+	}
 
-			physic.postUpdate = function(){}
-			physic.pastUpdate = function(){}
-			physic.prevUpdate = function(){}
+	reset(full) {
 
-			isPause = false;
+		this.stats.skip = 0;
 
-			oldMode = currentMode;
-			physic.setMode( '' );
+		//console.log('reset', full);
 
-			physic.stop();
+		this.postUpdate = function () { }
+		this.pastUpdate = function () { }
+		this.prevUpdate = function () { }
 
-			// remove all mesh
-			physic.clear();
+		this.isPause = false;
 
-			// remove tmp material
-			while ( root.tmpMat.length > 0 ) root.tmpMat.pop().dispose();
+		this.oldMode = this.currentMode;
+		this.setMode('');
 
-			tmpRemove = [];
-			tmpAdd = [];
-			oldFollow = '';
+		this.stop();
 
-			if ( root.refView ) root.refView.reset( full );
+		// remove all mesh
+		this.clear();
 
-			// clear physic object;
-			physic.post( 'reset', { full: full } );
+		// remove tmp material
+		while (root.tmpMat.length > 0) root.tmpMat.pop().dispose();
 
-		},
+		this.tmpRemove = [];
+		this.tmpAdd = [];
+		this.oldFollow = '';
 
-		pause: function () {
+		if (root.refView) root.refView.reset(full);
 
-			isPause = true;
+		// clear physic object;
+		this.post('reset', { full: full });
 
-		},
+	}
 
-		play: function () {
+	pause() {
 
-			if( !isPause ) return
-			isPause = false;
-			physic.start();
-			
-		}, 
+		this.isPause = true;
 
-		stop: function () {
+	}
 
-			if ( timer === null ) return;
+	play() {
 
-			if( option.animFrame ) window.cancelAnimationFrame( timer );
-			else clearInterval( timer );
-			
-			timer = null;
+		if (!this.isPause) return
+		this.isPause = false;
+		this.start();
 
-		},
+	}
 
-		destroy: function () {
+	stop() {
 
-			worker.terminate();
-			worker = undefined;
+		if (this.timer === null) return;
 
-		},
+		if (this.option.animFrame) window.cancelAnimationFrame(this.timer);
+		else clearInterval(this.timer);
 
+		this.timer = null;
 
+	}
 
-		////////////////////////////
+	destroy() {
 
-		addMat: function ( m ) {
+		this.worker.terminate();
+		this.worker = undefined;
 
-			root.tmpMat.push( m );
+	}
+	////////////////////////////
 
-		},
+	addMat(m) {
 
-		ellipsoidMesh: function ( o ) {
+		root.tmpMat.push(m);
 
-			softBody.createEllipsoid( o );
+	}
 
-		},
+	ellipsoidMesh(o) {
 
-		updateTmpMat: function ( envmap, hdr ) {
+		softBody.createEllipsoid(o);
 
-			var i = root.tmpMat.length, m;
-			while ( i -- ) {
+	}
 
-				m = root.tmpMat[ i ];
-				if ( m.envMap !== undefined ) {
+	updateTmpMat(envmap, hdr) {
 
-					if ( m.type === 'MeshStandardMaterial' ) m.envMap = envmap;
-					else m.envMap = hdr ? null : envmap;
-					m.needsUpdate = true;
+		var i = root.tmpMat.length, m;
+		while (i--) {
 
-				}
+			m = root.tmpMat[i];
+			if (m.envMap !== undefined) {
+
+				if (m.type === 'MeshStandardMaterial') m.envMap = envmap;
+				else m.envMap = hdr ? null : envmap;
+				m.needsUpdate = true;
 
 			}
 
-		},
+		}
 
-		setVehicle: function ( o ) {
+	}
 
-			root.flow.vehicle.push( o );
+	setVehicle(o) {
 
-		},
+		root.flow.vehicle.push(o);
 
-		drive: function ( name ) {
+	}
 
-			this.post( 'setDrive', name );
+	drive(name) {
 
-		},
+		this.post('setDrive', name);
 
-		move: function ( name ) {
+	}
 
-			this.post( 'setMove', name );
+	move(name) {
 
-		},
+		this.post('setMove', name);
 
-		//-----------------------------
-		//
-		//  DIRECT
-		//
-		//-----------------------------
+	}
 
-		// if( o.constructor !== Array ) o = [ o ];
+	//-----------------------------
+	//
+	//  DIRECT
+	//
+	//-----------------------------
 
-		forces: function ( o, direct ) {
+	// if( o.constructor !== Array ) o = [ o ];
 
-			direct = direct || false;
-			physic.post( direct ? 'directForces' : 'setForces', o );
+	forces(o, direct) {
 
-		},
+		direct = direct || false;
+		this.post(direct ? 'directForces' : 'setForces', o);
 
-		options: function ( o, direct ) {
+	}
 
-			direct = direct || false;
-			physic.post( direct ? 'directOptions' : 'setOptions', o );
+	options(o, direct) {
 
-		},
+		direct = direct || false;
+		this.post(direct ? 'directOptions' : 'setOptions', o);
 
-		matrix: function ( o, direct ) {
+	}
 
-			direct = direct || false;
-			physic.post( direct ? 'directMatrix' : 'setMatrix', o );
+	matrix(o, direct) {
 
-		},
+		direct = direct || false;
+		this.post(direct ? 'directMatrix' : 'setMatrix', o);
 
-		//-----------------------------
-		//
-		//  FLOW
-		//
-		//-----------------------------
+	}
 
-		clearFlow: function () {
+	//-----------------------------
+	//
+	//  FLOW
+	//
+	//-----------------------------
 
-			root.flow = { ray:[], terrain:[], vehicle:[] };
-			//root.flow = { matrix:{}, force:{}, option:{}, ray:[], terrain:[], vehicle:[] };
+	clearFlow() {
 
-		},
+		root.flow = { ray: [], terrain: [], vehicle: [] };
+		//root.flow = { matrix:{}, force:{}, option:{}, ray:[], terrain:[], vehicle:[] };
 
-		anchor: function ( o ) {
+	}
 
-			this.post( 'addAnchor', o );
+	anchor(o) {
 
-		},
+		this.post('addAnchor', o);
 
-		break: function ( o ) {
+	}
 
-			this.post( 'addBreakable', o );
+	break(o) {
 
-		},
+		this.post('addBreakable', o);
 
-		moveSolid: function ( o ) {
+	}
 
-			if ( ! map.has( o.name ) ) return;
-			var b = map.get( o.name );
-			if ( o.pos !== undefined ) b.position.fromArray( o.pos );
-			if ( o.quat !== undefined ) b.quaternion.fromArray( o.quat );
+	moveSolid(o) {
 
-		},
+		if (!map.has(o.name)) return;
+		var b = map.get(o.name);
+		if (o.pos !== undefined) b.position.fromArray(o.pos);
+		if (o.quat !== undefined) b.quaternion.fromArray(o.quat);
 
-		getBodys: function () {
+	}
 
-			return rigidBody.bodys;
+	getBodys() {
 
-		},
+		return rigidBody.bodys;
 
-		initObject: function () {
+	}
 
-			rigidBody = new RigidBody();
-			softBody = new SoftBody();
-			terrains = new Terrain();
-			vehicles = new Vehicle();
-			character = new Character();
-			collision = new Collision();
-			rayCaster = new RayCaster();
-			constraint = new Constraint();
+	initObject() {
 
-		},
+		this.rigidBody = new RigidBody();
+		this.softBody = new SoftBody();
+		this.terrains = new Terrain();
+		this.vehicles = new Vehicle();
+		this.character = new Character();
+		this.collision = new Collision();
+		this.rayCaster = new RayCaster();
+		this.constraint = new Constraint();
 
-		//-----------------------------
-		//
-		//  CLEAR
-		//
-		//-----------------------------
+	}
 
-		clear: function () {
+	//-----------------------------
+	//
+	//  CLEAR
+	//
+	//-----------------------------
 
-			physic.clearFlow();
+	clear() {
 
-			rigidBody.clear();
-			collision.clear();
-			terrains.clear();
-			vehicles.clear();
-			character.clear();
-			softBody.clear();
-			rayCaster.clear();
-			constraint.clear();
+		this.clearFlow();
 
-			while ( root.extraGeo.length > 0 ) root.extraGeo.pop().dispose();
+		this.rigidBody.clear();
+		this.collision.clear();
+		this.terrains.clear();
+		this.vehicles.clear();
+		this.character.clear();
+		this.softBody.clear();
+		this.rayCaster.clear();
+		this.constraint.clear();
 
-		},
+		while (root.extraGeo.length > 0) root.extraGeo.pop().dispose();
 
-		//-----------------------------
-		//
-		//  REMOVE
-		//
-		//-----------------------------
+	}
 
-		remove: function ( name, phy ) {
+	//-----------------------------
+	//
+	//  REMOVE
+	//
+	//-----------------------------
 
-		    // remove physics 
-			if( !phy ) this.post( 'remove', name );
+	remove(name, phy) {
 
-			//if ( ! map.has( name ) ) return;
-			var b = physic.byName( name );
-			if( b === null ) return;
+		// remove physics 
+		if (!phy) this.post('remove', name);
 
-			switch( b.type ){
+		//if ( ! map.has( name ) ) return;
+		var b = this.byName(name);
+		if (b === null) return;
 
-				case 'solid': case 'body' :
-				    rigidBody.remove( name );
+		switch (b.type) {
+
+			case 'solid': case 'body':
+				this.rigidBody.remove(name);
 				break;
 
-				case 'soft' :
-				    softBody.remove( name );
+			case 'soft':
+				this.softBody.remove(name);
 				break;
 
-				case 'terrain' :
-				    terrains.remove( name );
+			case 'terrain':
+				this.terrains.remove(name);
 				break;
 
-				case 'collision' :
-				    collision.remove( name );
+			case 'collision':
+				this.collision.remove(name);
 				break;
 
-				case 'ray' :
-				    rayCaster.remove( name );
+			case 'ray':
+				this.rayCaster.remove(name);
 				break;
 
-				case 'constraint':
-				    constraint.remove( name );
+			case 'constraint':
+				this.constraint.remove(name);
 				break;
 
+		}
+
+	}
+	//---------------------------------------
+	//
+	//---------------------------------------
+	info() {
+		return {
+			solids: this.rigidBody.solids.length,
+			bodys: this.rigidBody.bodys.length,
+			softs: this.softBody.softs.length,
+			terrains: this.terrains.terrains.length,
+			cars: this.vehicles.cars.length,
+			rays: this.rayCaster.rays.length,
+			pairs: this.collision.pairs.length,
+			joints: this.constraint.joints.length
+		};
+	}
+	removes(o) {
+
+		this.tmpRemove = this.tmpRemove.concat(o);
+
+	}
+
+	removesDirect(o) {
+
+		this.post('directRemoves', o);
+
+	}
+	//-----------------------------
+	//
+	//  FIND OBJECT
+	//
+	//-----------------------------
+
+	byName(name) {
+
+		if (!map.has(name)) { this.tell('no find object !!'); return null; }
+		else return map.get(name);
+
+	}
+
+	has(name) {
+		return map.has(name);
+	}
+
+	//-----------------------------
+	//
+	//  ADD
+	//
+	//-----------------------------
+
+	addGroup(list) {
+
+		tmpAdd = tmpAdd.concat(list);
+
+	}
+
+	add(o) {
+
+		o = o || {};
+		var type = o.type === undefined ? 'box' : o.type;
+		var prev = type.substring(0, 4);
+
+		if (prev === 'join') return this.constraint.add(o);
+		else if (prev === 'soft') return this.softBody.add(o);
+		else if (type === 'terrain') return this.terrains.add(o);
+		else if (type === 'character') return this.character.add(o);
+		else if (type === 'collision') return this.collision.add(o);
+		else if (type === 'car') return this.vehicles.add(o);
+		else if (type === 'ray') return this.rayCaster.add(o);
+		else return this.rigidBody.add(o);
+
+	}
+
+	defaultRoot() {
+
+		// geometry
+
+		var geo = {
+			circle: new THREE.CircleBufferGeometry(1, 6),
+			plane: new THREE.PlaneBufferGeometry(1, 1, 1, 1),
+			box: new THREE.BoxBufferGeometry(1, 1, 1),
+			hardbox: new THREE.BoxBufferGeometry(1, 1, 1),
+			cone: new THREE.CylinderBufferGeometry(0, 1, 0.5),
+			wheel: new THREE.CylinderBufferGeometry(1, 1, 1, 18),
+			sphere: new THREE.SphereBufferGeometry(1, 16, 12),
+			highsphere: new THREE.SphereBufferGeometry(1, 32, 24),
+			cylinder: new THREE.CylinderBufferGeometry(1, 1, 1, 12, 1),
+			hardcylinder: new THREE.CylinderBufferGeometry(1, 1, 1, 12, 1),
+			joint: new THREE.ConeBufferGeometry(0.1, 0.2, 4),
+		};
+
+		geo.circle.rotateX(- this.PI90);
+		geo.plane.rotateX(- this.PI90);
+		geo.wheel.rotateZ(- this.PI90);
+
+		geo.joint.translate(0, 0.1, 0);
+		geo.joint.rotateZ(-Math.PI * 0.5);
+
+		root.geo = geo;
+
+		// material
+
+		var wire = false;
+		var shadowSide = false;
+
+		root.mat = {
+
+			hide: new THREE.MeshBasicMaterial({ name: 'debug', color: 0x000000, depthTest: false, depthWrite: false, visible: false }),
+
+			move: new THREE.MeshLambertMaterial({ color: 0xCCCCCC, name: 'move', wireframe: wire, shadowSide: shadowSide }),
+			speed: new THREE.MeshLambertMaterial({ color: 0xFFCC33, name: 'speed', wireframe: wire, shadowSide: shadowSide }),
+			sleep: new THREE.MeshLambertMaterial({ color: 0x33CCFF, name: 'sleep', wireframe: wire, shadowSide: shadowSide }),
+			static: new THREE.MeshLambertMaterial({ color: 0x333333, name: 'static', wireframe: wire, shadowSide: shadowSide, transparent: true, opacity: 0.3, depthTest: true, depthWrite: false }),
+			kinematic: new THREE.MeshLambertMaterial({ color: 0x88FF33, name: 'kinematic', wireframe: wire, shadowSide: shadowSide }),
+			soft: new THREE.MeshLambertMaterial({ name: 'soft', vertexColors: THREE.VertexColors, shadowSide: shadowSide }),
+
+			debug: new THREE.MeshBasicMaterial({ name: 'debug', color: 0x00FF00, depthTest: false, depthWrite: false, wireframe: true, shadowSide: shadowSide }),
+
+
+			jointLine: new THREE.LineBasicMaterial({ name: 'jointLine', vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true }),
+			jointP1: new THREE.MeshBasicMaterial({ name: 'jointP1', color: 0x00FF00, depthTest: false, depthWrite: true, wireframe: true }),
+			jointP2: new THREE.MeshBasicMaterial({ name: 'jointP2', color: 0xFFFF00, depthTest: false, depthWrite: true, wireframe: true }),
+
+		};
+
+		root.container = new THREE.Group();
+
+		root.destroy = function (b) {
+
+			var m;
+			while (b.children.length > 0) {
+				m = b.children.pop();
+				while (m.children.length > 0) m.remove(m.children.pop());
+				b.remove(m);
 			}
 
-		},
-		//---------------------------------------
-		//
-		//---------------------------------------
-		info:function(){
-			return {
-				solids:rigidBody.solids.length,
-				bodys:rigidBody.bodys.length,
-				softs:softBody.softs.length,
-				terrains:terrains.terrains.length,
-				cars:vehicles.cars.length,				
-				rays:rayCaster.rays.length,
-				pairs:collision.pairs.length,
-				joints:constraint.joints.length
-			};
-		},
-		removes: function ( o ) {
+			if (b.parent) b.parent.remove(b);
 
-			tmpRemove = tmpRemove.concat( o );
+		}
 
-		},
+	}
 
-		removesDirect: function ( o ) {
+	getContainer() {
 
-			this.post( 'directRemoves', o );
+		return root.container;
 
-		},
+	}
 
-		//-----------------------------
-		//
-		//  FIND OBJECT
-		//
-		//-----------------------------
+	//-----------------------------
+	//
+	//  BREAKABLE
+	//
+	//-----------------------------
 
-		byName: function ( name ) {
+	makeBreak(o) {
 
-			if ( ! map.has( name ) ) { physic.tell('no find object !!' ); return null; }
-			else return map.get( name );
+		var name = o.name;
+		if (!map.has(name)) return;
 
-		},
-		
-		has: function( name ){
-			return map.has( name );
-		},
-		
-		//-----------------------------
-		//
-		//  ADD
-		//
-		//-----------------------------
+		if (this.convexBreaker === null) this.convexBreaker = new ConvexObjectBreaker();
 
-		addGroup: function ( list ) {
+		var mesh = map.get(name);
 
-			tmpAdd = tmpAdd.concat( list );
+		mesh.userData.velocity = mesh.userData.velocity || new THREE.Vector3();
+		mesh.userData.angularVelocity = mesh.userData.angularVelocity || new THREE.Vector3();
+		// breakOption: [ maxImpulse, maxRadial, maxRandom, levelOfSubdivision ]
+		var breakOption = o.breakOption;
 
-		},
-
-		add: function ( o ) {
-
-			o = o || {};
-			var type = o.type === undefined ? 'box' : o.type;
-			var prev = type.substring( 0, 4 );
-
-			if ( prev === 'join' ) return constraint.add( o );
-			else if ( prev === 'soft' ) return softBody.add( o );
-			else if ( type === 'terrain' ) return terrains.add( o );
-			else if ( type === 'character' ) return character.add( o );
-			else if ( type === 'collision' ) return collision.add( o );
-			else if ( type === 'car' ) return vehicles.add( o );
-			else if ( type === 'ray' ) return rayCaster.add( o );
-			else return rigidBody.add( o );
-
-		},
-
-		defaultRoot: function () {
-
-			// geometry
-
-			var geo = {
-				circle: new THREE.CircleBufferGeometry( 1, 6 ),
-				plane: new THREE.PlaneBufferGeometry( 1, 1, 1, 1 ),
-				box: new THREE.BoxBufferGeometry( 1, 1, 1 ),
-				hardbox: new THREE.BoxBufferGeometry( 1, 1, 1 ),
-				cone: new THREE.CylinderBufferGeometry( 0, 1, 0.5 ),
-				wheel: new THREE.CylinderBufferGeometry( 1, 1, 1, 18 ),
-				sphere: new THREE.SphereBufferGeometry( 1, 16, 12 ),
-				highsphere: new THREE.SphereBufferGeometry( 1, 32, 24 ),
-				cylinder: new THREE.CylinderBufferGeometry( 1, 1, 1, 12, 1 ),
-				hardcylinder: new THREE.CylinderBufferGeometry( 1, 1, 1, 12, 1 ),
-				joint: new THREE.ConeBufferGeometry( 0.1,0.2, 4 ),
-			};
-
-			geo.circle.rotateX( - PI90 );
-			geo.plane.rotateX( - PI90 );
-			geo.wheel.rotateZ( - PI90 );
-
-			 geo.joint.translate( 0, 0.1, 0 );
-			 geo.joint.rotateZ( -Math.PI*0.5 );
-
-			root.geo = geo;
-
-			// material
-
-			var wire = false;
-			var shadowSide = false;
-			
-			root.mat = {
-
-				hide: new THREE.MeshBasicMaterial({ name: 'debug', color:0x000000, depthTest:false, depthWrite:false, visible:false }),
-
-				move: new THREE.MeshLambertMaterial( { color: 0xCCCCCC, name: 'move', wireframe: wire, shadowSide:shadowSide } ),
-				speed: new THREE.MeshLambertMaterial( { color: 0xFFCC33, name: 'speed', wireframe: wire, shadowSide:shadowSide } ),
-				sleep: new THREE.MeshLambertMaterial( { color: 0x33CCFF, name: 'sleep', wireframe: wire, shadowSide:shadowSide } ),
-				static: new THREE.MeshLambertMaterial( { color: 0x333333, name: 'static', wireframe: wire, shadowSide:shadowSide, transparent:true, opacity:0.3, depthTest:true, depthWrite:false } ),
-				kinematic: new THREE.MeshLambertMaterial( { color: 0x88FF33, name: 'kinematic', wireframe: wire, shadowSide:shadowSide } ),
-				soft: new THREE.MeshLambertMaterial({ name: 'soft', vertexColors:THREE.VertexColors, shadowSide:shadowSide }),
-
-				debug: new THREE.MeshBasicMaterial({ name: 'debug', color:0x00FF00, depthTest:false, depthWrite:false, wireframe:true, shadowSide:shadowSide }),
+		var debris = this.convexBreaker.subdivideByImpact(mesh, new THREE.Vector3().fromArray(o.pos), new THREE.Vector3().fromArray(o.normal), breakOption[1], breakOption[2]); // , 1.5 ??
+		// remove one level
+		breakOption[3] -= 1;
 
 
-				jointLine: new THREE.LineBasicMaterial( { name: 'jointLine', vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true }),
-				jointP1: new THREE.MeshBasicMaterial({ name: 'jointP1', color:0x00FF00, depthTest:false, depthWrite:true, wireframe:true }),
-				jointP2: new THREE.MeshBasicMaterial({ name: 'jointP2', color:0xFFFF00, depthTest:false, depthWrite:true, wireframe:true }),
+		// remove original object
+		this.tmpRemove.push(name);
 
-			};
+		var i = debris.length;
+		while (i--) this.tmpAdd.push(this.addDebris(name, i, debris[i], breakOption));
 
-			root.container = new THREE.Group();
+		//while ( i -- ) this.addDebris( name, i, debris[ i ], breakOption );
 
-			root.destroy = function ( b ) {
+	}
 
-		        var m;
-		        while( b.children.length > 0 ) {
-		            m = b.children.pop();
-		            while( m.children.length > 0 ) m.remove( m.children.pop() );
-		            b.remove( m );
-		        }
+	addDebris(name, id, mesh, breakOption) {
 
-		        if ( b.parent ) b.parent.remove( b );
+		var o = {
+			name: name + '_debris' + id,
+			material: mesh.material,
+			type: 'convex',
+			shape: mesh.geometry,
+			//size: mesh.scale.toArray(),
+			pos: mesh.position.toArray(),
+			quat: mesh.quaternion.toArray(),
+			mass: mesh.userData.mass,
+			linearVelocity: mesh.userData.velocity.toArray(),
+			angularVelocity: mesh.userData.angularVelocity.toArray(),
+			margin: 0.05,
+		};
 
-		    }
+		// if levelOfSubdivision > 0 make debris breakable !!
+		if (breakOption[3] > 0) {
 
-		},
+			o.breakable = true;
+			o.breakOption = breakOption;
 
-		getContainer: function () {
+		}
 
-			return root.container;
+		//this.add( o );
 
-		},
+		return o;
 
-		//-----------------------------
-		//
-		//  BREAKABLE
-		//
-		//-----------------------------
+	}
 
-		makeBreak: function ( o ) {
 
-			var name = o.name;
-			if ( ! map.has( name ) ) return;
+	//-----------------------------
+	//
+	// EXTRA MODE
+	//
+	//-----------------------------
 
-			if ( convexBreaker === null ) convexBreaker = new ConvexObjectBreaker();
+	setMode(mode) {
+		console.log('mode===' + mode);
+		if (mode !== this.currentMode) {
 
-			var mesh = map.get( name );
+			if (this.currentMode === 'picker') this.removeRayCamera();
+			if (this.currentMode === 'shoot') this.removeShootCamera();
+			if (this.currentMode === 'lock') this.removeLockCamera();
 
-			mesh.userData.velocity = mesh.userData.velocity||new THREE.Vector3();
-			mesh.userData.angularVelocity = mesh.userData.angularVelocity||new THREE.Vector3();
-			// breakOption: [ maxImpulse, maxRadial, maxRandom, levelOfSubdivision ]
-			var breakOption = o.breakOption;
+		}
 
-			var debris = convexBreaker.subdivideByImpact( mesh, new THREE.Vector3().fromArray(o.pos), new THREE.Vector3().fromArray(o.normal), breakOption[ 1 ], breakOption[ 2 ] ); // , 1.5 ??
-			// remove one level
-			breakOption[ 3 ] -= 1;
-			
-			
-			// remove original object
-			tmpRemove.push( name );
+		this.currentMode = mode;
 
-			var i = debris.length;
-			while ( i -- ) tmpAdd.push( this.addDebris( name, i, debris[ i ], breakOption ) );
+		if (this.currentMode === 'picker') this.addRayCamera();
+		if (this.currentMode === 'shoot') this.addShootCamera();
+		if (this.currentMode === 'lock') this.addLockCamera();
 
-			//while ( i -- ) this.addDebris( name, i, debris[ i ], breakOption );
+	}
 
-		},
+	// CAMERA LOCK
 
-		addDebris: function ( name, id, mesh, breakOption ) {
+	addLockCamera() {
 
-			var o = {
-				name: name + '_debris' + id,
-				material: mesh.material,
-				type: 'convex',
-				shape: mesh.geometry,
-				//size: mesh.scale.toArray(),
-				pos: mesh.position.toArray(),
-				quat: mesh.quaternion.toArray(),
-				mass: mesh.userData.mass,
-				linearVelocity: mesh.userData.velocity.toArray(),
-				angularVelocity: mesh.userData.angularVelocity.toArray(),
-				margin: 0.05,
-			};
+	}
 
-			// if levelOfSubdivision > 0 make debris breakable !!
-			if ( breakOption[ 3 ] > 0 ) {
+	removeLockCamera() {
 
-				o.breakable = true;
-				o.breakOption = breakOption;
+	}
 
+	// CAMERA SHOOT
+
+	addShootCamera() {
+
+	}
+
+	removeShootCamera() {
+
+	}
+
+	// CAMERA RAY
+
+	addRayCamera() {
+
+		if (!root.refView) return;
+		//debugger;
+		this.ray = this.add({ name: 'cameraRay', type: 'ray', callback: this.onRay.bind(this), mask: 1, visible: false });// only move body
+		root.refView.activeRay(this.updateRayCamera.bind(this), false);
+
+	}
+
+	removeRayCamera() {
+
+		if (!root.refView) return;
+		this.remove('cameraRay');
+		root.refView.removeRay();
+		this.log();
+
+	}
+
+	updateRayCamera(offset) {
+		//console.log('mouseMode=='+mouseMode);
+		//ray.setFromCamera( refView.getMouse(), refView.getCamera() );
+		if (this.mouseMode === 'drag') this.matrix([{ name: 'dragger', pos: offset.toArray(), keepRot: true }]);
+
+	}
+
+	onRay(o) {
+		var mouse = root.refView.getMouse();
+		var control = root.refView.getControls();
+		var name = o.name === undefined ? '' : o.name;
+		//console.log('o.name=='+o.name);
+		this.ray.setFromCamera(mouse, control.object);
+
+		if (mouse.z === 0) {
+
+			if (this.mouseMode === 'drag') {
+				control.enableRotate = true;
+				this.removeConnector();
 			}
 
-			//this.add( o );
+			this.mouseMode = 'free';
 
-			return o;
+		} else {
 
-		},
+			if (this.mouseMode === 'free') {
 
-		//-----------------------------
-		//
-		// EXTRA MODE
-		//
-		//-----------------------------
+				if (name) {
 
-		setMode: function ( mode ) {
-			console.log('mode==='+mode);
-			if ( mode !== currentMode ) {
-
-				if ( currentMode === 'picker' ) physic.removeRayCamera();
-				if ( currentMode === 'shoot' ) physic.removeShootCamera();
-				if ( currentMode === 'lock' ) physic.removeLockCamera();
-
-			}
-
-			currentMode = mode;
-
-			if ( currentMode === 'picker' ) physic.addRayCamera();
-			if ( currentMode === 'shoot' ) physic.addShootCamera();
-			if ( currentMode === 'lock' ) physic.addLockCamera();
-
-		},
-
-		// CAMERA LOCK
-
-		addLockCamera: function () {
-
-		},
-
-		removeLockCamera: function () {
-
-		},
-
-		// CAMERA SHOOT
-
-		addShootCamera: function () {
-
-		},
-
-		removeShootCamera: function () {
-
-		},
-
-		// CAMERA RAY
-
-		addRayCamera: function () {
-
-			if ( ! root.refView ) return;
-			//debugger;
-			ray = physic.add( { name: 'cameraRay', type: 'ray', callback: physic.onRay, mask: 1, visible: false } );// only move body
-			root.refView.activeRay( physic.updateRayCamera, false );
-
-		},
-
-		removeRayCamera: function () {
-
-			if ( ! root.refView ) return;
-			physic.remove( 'cameraRay' );
-			root.refView.removeRay();
-			physic.log();
-
-		},
-
-		updateRayCamera: function ( offset ) {
-			//console.log('mouseMode=='+mouseMode);
-			//ray.setFromCamera( refView.getMouse(), refView.getCamera() );
-			if ( mouseMode === 'drag' ) physic.matrix( [{ name:'dragger', pos: offset.toArray(), keepRot:true }] );
-
-		},
-
-		onRay: function ( o ) {
-			var mouse = root.refView.getMouse();
-			var control = root.refView.getControls();
-			var name = o.name === undefined ? '' : o.name;
-			//console.log('o.name=='+o.name);
-			ray.setFromCamera( mouse, control.object );
-
-			if ( mouse.z === 0 ) {
-
-				if ( mouseMode === 'drag' ){ 
-					control.enableRotate = true;
-					physic.removeConnector();
-				}
-
-				mouseMode = 'free';
-
-			} else {
-
-				if ( mouseMode === 'free' ) {
-
-					if ( name ) {
-
-						if( mouseMode !== 'drag' ){							
-							root.refView.setDragPlane( o.point );
-						    control.enableRotate = false;
-						    physic.addConnector( o );
-						    mouseMode = 'drag';
-
-						} 
-
-					} else {
-
-						mouseMode = 'rotate';
+					if (this.mouseMode !== 'drag') {
+						root.refView.setDragPlane(o.point);
+						control.enableRotate = false;
+						this.addConnector(o);
+						this.mouseMode = 'drag';
 
 					}
 
+				} else {
+
+					this.mouseMode = 'rotate';
+
 				}
 
-				/*if ( mouseMode === 'drag' ){
-
-					physic.matrix( [{ name:'dragger', pos: root.refView.getOffset().toArray() }] );
-
-				}*/
-
 			}
 
-			// debug
-			physic.log( mouseMode + '   ' + name );
+			/*if ( mouseMode === 'drag' ){
 
-		},
+				physic.matrix( [{ name:'dragger', pos: root.refView.getOffset().toArray() }] );
 
-		addConnector: function ( o ) {
+			}*/
 
-			//if ( ! map.has( o.name ) ) { console.log('no find !!'); return;}
-			//var mesh = map.get( o.name );
+		}
 
-			var mesh = physic.byName( o.name );
-			if( mesh === null ) return;
+		// debug
+		this.log(this.mouseMode + '   ' + name);
 
-			// reste follow on drag
-			physic.testCurrentFollow( o.name );  
+	}
 
+	addConnector(o) {
 
-			var p0 = new THREE.Vector3().fromArray( o.point );
-			var qB = mesh.quaternion.toArray();
-			var pos = physic.getLocalPoint( p0, mesh ).toArray();
+		//if ( ! map.has( o.name ) ) { console.log('no find !!'); return;}
+		//var mesh = map.get( o.name );
 
-			physic.add({ 
-				name:'dragger', 
-				type:'sphere', 
-				size:[0.2], 
-				pos:o.point,
-				quat: qB, 
-				mass:0, 
-				kinematic: true,
-				group:32,
-				mask:32, 
-			});
+		var mesh = this.byName(o.name);
+		if (mesh === null) return;
 
-			physic.add({ 
-				name:'connector', 
-				type:'joint_fixe', 
-				b1:'dragger', b2:o.name, 
-				pos1:[0,0,0], pos2:pos,
-				collision:false 
-			});
-		},
-
-		removeConnector: function () {
-
-			physic.remove( 'dragger' );
-			physic.remove( 'connector' );
-
-			if( oldFollow !== '' ) physic.setCurrentFollow( oldFollow );
-
-		},
-
-		getLocalPoint: function (vector, mesh) {
-			
-			mesh.updateMatrix();
-			//mesh.updateMatrixWorld(true);
-			var m1 = new THREE.Matrix4();
-			var s = new THREE.Vector3(1,1,1);
-			var m0 = new THREE.Matrix4().compose( mesh.position, mesh.quaternion, s );
-			m1.copy( m0 ).invert();
-			return vector.applyMatrix4( m1 );
-
-		},
-
-		setCurrentFollow: function ( name, o ) {
-
-			if( !root.refView ) return;
-			var target = physic.byName( name );
-            if( target !== null ) root.refView.getControls().initFollow( target, o );
-            else root.refView.getControls().resetFollow();
-            oldFollow = '';
-
-		},
+		// reste follow on drag
+		this.testCurrentFollow(o.name);
 
 
-		testCurrentFollow: function ( name ) {
+		var p0 = new THREE.Vector3().fromArray(o.point);
+		var qB = mesh.quaternion.toArray();
+		var pos = this.getLocalPoint(p0, mesh).toArray();
 
-			oldFollow = '';
-			if( !root.refView ) return;
-			if( !root.refView.getControls().followTarget ) return;
-			if( root.refView.getControls().followTarget.name === name ){ 
-				root.refView.getControls().resetFollow();
-				oldFollow = name;
-			}
+		this.add({
+			name: 'dragger',
+			type: 'sphere',
+			size: [0.2],
+			pos: o.point,
+			quat: qB,
+			mass: 0,
+			kinematic: true,
+			group: 32,
+			mask: 32,
+		});
 
-		},
+		this.add({
+			name: 'connector',
+			type: 'joint_fixe',
+			b1: 'dragger', b2: o.name,
+			pos1: [0, 0, 0], pos2: pos,
+			collision: false
+		});
+	}
+
+	removeConnector() {
+
+		this.remove('dragger');
+		this.remove('connector');
+
+		if (this.oldFollow !== '') this.setCurrentFollow(this.oldFollow);
+
+	}
+
+	getLocalPoint(vector, mesh) {
+
+		mesh.updateMatrix();
+		//mesh.updateMatrixWorld(true);
+		var m1 = new THREE.Matrix4();
+		var s = new THREE.Vector3(1, 1, 1);
+		var m0 = new THREE.Matrix4().compose(mesh.position, mesh.quaternion, s);
+		m1.copy(m0).invert();
+		return vector.applyMatrix4(m1);
+
+	}
+
+	setCurrentFollow(name, o) {
+
+		if (!root.refView) return;
+		var target = this.byName(name);
+		if (target !== null) root.refView.getControls().initFollow(target, o);
+		else root.refView.getControls().resetFollow();
+		this.oldFollow = '';
+
+	}
 
 
+	testCurrentFollow(name) {
 
-	};
+		this.oldFollow = '';
+		if (!root.refView) return;
+		if (!root.refView.getControls().followTarget) return;
+		if (root.refView.getControls().followTarget.name === name) {
+			root.refView.getControls().resetFollow();
+			this.oldFollow = name;
+		}
 
-} )();
+	}
+
+}
+export { WPhysic };

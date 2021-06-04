@@ -41,7 +41,7 @@ import { DDLSRender } from '../../jsm/ddls/DDLSRender.js';
 
 import { WGui } from '../../jsm/world/WGui.js';
 import { WView } from '../../jsm/world/WView.js';
-import { physic } from '../../jsm/world/WPhysic.js';
+import { WPhysic } from '../../jsm/world/WPhysic.js';
 import { WAvatar } from '../../jsm/world/WAvatar.js';
 import { WAnimal } from '../../jsm/world/WAnimal.js';
 import { WMMD } from '../../jsm/world/WMMD.js';
@@ -3400,7 +3400,7 @@ class WorldEngine extends THREE.EventDispatcher {
 		this.user = new WUser();
 		this.debugTell("初始化三维引擎...");
 		this.view = new WView(this.loadingManager);
-		this.physic = physic;
+		this.physic = new WPhysic();
 		this.ddlsworld = new DDLSWorld(10, 10);
 
 		this.view.init(options);
@@ -3449,7 +3449,7 @@ class WorldEngine extends THREE.EventDispatcher {
 			_self.physic.getKey = function () { return _self.keys };
 			_self.importScripts(['./datas/world.scenes.js'], function () {
 				_self.gui.initUI_scenes();
-				_self.gui.addExtraOption(_self.physic.setMode);
+				_self.gui.addExtraOption(_self.physic.setMode.bind(_self.physic));
 				_self.scene.create();
 			});
 
