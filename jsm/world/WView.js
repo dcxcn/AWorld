@@ -497,7 +497,7 @@ class WView {
 			this.renderer.shadowMap.enabled = this.isShadow = true;
 		}
 		//this.sunLight.castShadow = isShadow;
-		//window.WEngine.updateMaterials();
+		//window.AWEngine.updateMaterials();
 	}
 	setCameraFollowBehind(b) {
 		this.cameraFollowBehind = b;
@@ -813,8 +813,8 @@ class WView {
 		this.cameraHUDSprite.top = window.innerHeight / 2;
 		this.cameraHUDSprite.bottom = - window.innerHeight / 2;
 		this.cameraHUDSprite.updateProjectionMatrix();
-		if (window.WEngine.compass)
-			window.WEngine.compass.position.set((-window.innerWidth / 2) + window.WEngine.compass.material.map.image.width / 2, (window.innerHeight / 2) - window.WEngine.compass.material.map.image.height / 2, 0);
+		if (window.AWEngine.compass)
+			window.AWEngine.compass.position.set((-window.innerWidth / 2) + window.AWEngine.compass.material.map.image.width / 2, (window.innerHeight / 2) - window.AWEngine.compass.material.map.image.height / 2, 0);
 		this.renderer.setSize((window.innerWidth - this.cameraSizeConstraint.width), (window.innerHeight - this.cameraSizeConstraint.height));
 		this.labelRenderer.setSize((window.innerWidth - this.cameraSizeConstraint.width), (window.innerHeight - this.cameraSizeConstraint.height));
 		this.outlineEffect.setSize(window.innerWidth, window.innerHeight);
@@ -871,7 +871,7 @@ class WView {
 		this.cameraControls.enablePan = b;
 	}
 	controlUpdate(delta) {
-		if (window.WEngine.currentFollow === null) return;
+		if (window.AWEngine.currentFollow === null) return;
 
 		//this.setControle( true );		
 		this.cam.theta = this.cameraControls.getAzimuthalAngle() + Math.Pi;
@@ -889,7 +889,7 @@ class WView {
 		}
 		if (this.cameraFollowBehind) {
 			var matrix = new THREE.Matrix4();
-			matrix.extractRotation(window.WEngine.currentFollow.matrix);
+			matrix.extractRotation(window.AWEngine.currentFollow.matrix);
 			var front = new THREE.Vector3(0, 0, 1);
 			front.applyMatrix4(matrix);
 			this.cam.theta = Math.atan2(front.x, front.z);
@@ -899,7 +899,7 @@ class WView {
 			this.cam.oPhi = this.cam.phi;
 			this.cam.oTheta = this.cam.theta;
 		}
-		this.cameraControls.target.copy(window.WEngine.currentFollow.position);
+		this.cameraControls.target.copy(window.AWEngine.currentFollow.position);
 		this.cameraControls.update(delta);
 	}
 	enableOutlineEffect(b) {

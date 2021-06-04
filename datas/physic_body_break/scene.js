@@ -14,7 +14,7 @@
 		w:60,
 		h:30,
 		pos:{right:'10px', top:'10px'},
-		callback:function(b){window.WEngine.play(b);}
+		callback:function(b){window.AWEngine.play(b);}
 	}],
 	models:[{
 		name:'human1',

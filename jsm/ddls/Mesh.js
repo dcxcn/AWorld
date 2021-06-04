@@ -566,9 +566,9 @@ Mesh.prototype.draw = function(){
     while(i--){
         n = i * 5;
         if(edge[n+4]) {
-             window.WEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0,0,0);
+             window.AWEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0,0,0);
         }else{
-             window.WEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0.4,0.4,0.4);
+             window.AWEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0.4,0.4,0.4);
         }
     }
     this.isRedraw = false;

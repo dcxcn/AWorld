@@ -2561,12 +2561,12 @@ DDLS.Heroe.prototype = {
 		   var prevPoint = new THREE.Vector3(this.mesh.position.x,this.mesh.position.y,this.mesh.position.z);
 		   forward.subVectors( point, prevPoint ).normalize();
 		   var angle = Math.atan2( forward.x, forward.z );
-		   window.WEngine.options({
+		   window.AWEngine.options({
 			   name:this.mesh.name,
 			   type:'character',
 			   angle:angle			   
 		   },true);
-		   window.WEngine.options({
+		   window.AWEngine.options({
 			   name:this.mesh.name,
 			   type:'character',
 			   pos:[this.entity.position.x,this.mesh.position.y,this.entity.position.y]			   
@@ -2755,9 +2755,9 @@ DDLS.Mesh.prototype.draw = function(){
     while(i--){
         n = i * 5;
         if(edge[n+4]) {
-             window.WEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0,0,0);
+             window.AWEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0,0,0);
         }else{
-             window.WEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0.4,0.4,0.4);
+             window.AWEngine.ddlsRender.insertLine(edge[n], edge[n+1], edge[n+2], edge[n+3], 0.4,0.4,0.4);
         }
     }
     this.isRedraw = false;

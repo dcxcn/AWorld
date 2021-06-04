@@ -127,7 +127,7 @@ var materials = {
 
     updateEnvmap: function (){ 
 
-        var env = window.WEngine.view.getEnvmap();
+        var env = window.AWEngine.view.getEnvmap();
 
         data.forEach( function ( m, key ) { 
 
@@ -302,7 +302,7 @@ var materials = {
         if(noEnv){
             mat.noEnv = true;
         }else {
-            if( mat.envMap !== undefined ) mat.envMap = window.WEngine.view.getEnvmap();
+            if( mat.envMap !== undefined ) mat.envMap = window.AWEngine.view.getEnvmap();
         }
         
         // clear on reset

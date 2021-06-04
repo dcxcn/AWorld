@@ -3022,7 +3022,7 @@ Fps.prototype = Object.assign( Object.create( Proto.prototype ), {
         }
 
         this.drawGraph();
-        this.c[1].innerHTML = 'FPS ' + this.fps + '<font color="yellow"> MS '+ ( this.ms | 0 ) + '</font><font color="cyan"> MB '+ this.mem + '</font><font color="green"> ammo '+ window.WEngine.physic.getFps() + '</font>';
+        this.c[1].innerHTML = 'FPS ' + this.fps + '<font color="yellow"> MS '+ ( this.ms | 0 ) + '</font><font color="cyan"> MB '+ this.mem + '</font><font color="green"> ammo '+ window.AWEngine.physic.getFps() + '</font>';
 
         return time;
 

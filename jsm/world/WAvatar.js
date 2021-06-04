@@ -42,7 +42,7 @@ var WAvatar = function (pConfO) {
 	this.curFreezeActionName=null;
 	this.mixamoOffset = new Vector3(0,0,0);
 	this.size = pConfO.size;	
-	this.addModel(window.WEngine.view.getModel(this.ename));
+	this.addModel(window.AWEngine.view.getModel(this.ename));
 	this.initActions(pConfO)
 	this.damageUUIDS = [];
 	
@@ -151,8 +151,8 @@ WAvatar.prototype =  {
 	},
 	doAction : function(actionName){
 		
-		window.WEngine.playSound(this.model.parent,actionName);
-		if(actionName!=this.curActionName) window.WEngine.stopPlaySound(this.model.parent,this.curActionName);
+		window.AWEngine.playSound(this.model.parent,actionName);
+		if(actionName!=this.curActionName) window.AWEngine.stopPlaySound(this.model.parent,this.curActionName);
 
 		
 		//console.log(this.ename+'----doAction=='+actionName);
@@ -212,8 +212,8 @@ WAvatar.prototype =  {
 		}		
 	},
 	getKey : function(){
-		if(window.WEngine.currentFollow && window.WEngine.currentFollow.userData.avatar == this){
-			return window.WEngine.user.keyboard.getKey();
+		if(window.AWEngine.currentFollow && window.AWEngine.currentFollow.userData.avatar == this){
+			return window.AWEngine.user.keyboard.getKey();
 		}else{
 			return  new Float32Array( 20 );
 		}
@@ -222,7 +222,7 @@ WAvatar.prototype =  {
 		if( this.handGun){
 			this.handR.remove( this.handGun );
 		}	
-		var gun = window.WEngine.byName('handgun1');
+		var gun = window.AWEngine.byName('handgun1');
 		gun.position.set(-0.05,0.05,0);
 		gun.rotation.set(0,Math.PI/2,Math.PI/2*0.85);
 		this.handR.add( gun );
@@ -847,7 +847,7 @@ WAvatar.prototype.initActions = function (pConfO){
 		this.hasActions = true;
 		var actions = pConfO.actions;
 		for(var i=0;i<actions.length;i++){
-			var actionO = window.WEngine.getActionData(actions[i].refBVH);		
+			var actionO = window.AWEngine.getActionData(actions[i].refBVH);		
 			var newClip = this.makeAnimation(actionO,actions[i].name,actions[i]);
 			this.actions[actions[i].name] = this.mixer.clipAction( newClip);
 		}
@@ -862,14 +862,14 @@ WAvatar.prototype.initActions = function (pConfO){
 WAvatar.prototype.addHelper = function (){
 
     this.helper = new SkeletonHelper( this.model );
-    window.WEngine.view.addVisual( this.helper );
+    window.AWEngine.view.addVisual( this.helper );
 
 };
 
 WAvatar.prototype.removeHelper = function (){
 
 	if(this.helper!=null){
-		window.WEngine.view.removeVisual( this.helper );
+		window.AWEngine.view.removeVisual( this.helper );
 		this.helper = null;
 	}
 };

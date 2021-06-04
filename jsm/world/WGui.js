@@ -260,38 +260,38 @@ class WGui {
 
 
 	heroVisibility() {
-		if (window.WEngine.currentFollow.userData.avatar.model.visible) { window.WEngine.currentFollow.userData.avatar.model.visible = false; }
-		else { window.WEngine.currentFollow.userData.avatar.model.visible = true; }
+		if (window.AWEngine.currentFollow.userData.avatar.model.visible) { window.AWEngine.currentFollow.userData.avatar.model.visible = false; }
+		else { window.AWEngine.currentFollow.userData.avatar.model.visible = true; }
 	}
 	heroFollowBehind(b) {
 		this.isFollow = b;
-		window.WEngine.view.setCameraFollowBehind(b);
+		window.AWEngine.view.setCameraFollowBehind(b);
 	}
 	helperVisibility() {
-		if (window.WEngine.currentFollow.userData.avatar.helper == null) window.WEngine.currentFollow.userData.avatar.addHelper();
-		else window.WEngine.currentFollow.userData.avatar.removeHelper();
+		if (window.AWEngine.currentFollow.userData.avatar.helper == null) window.AWEngine.currentFollow.userData.avatar.addHelper();
+		else window.AWEngine.currentFollow.userData.avatar.removeHelper();
 
 	}
 	enableDDLSDebug(b) {
-		window.WEngine.enableDDLSDebug(b);
+		window.AWEngine.enableDDLSDebug(b);
 	}
 	setHour(h) {
-		window.WEngine.setHour(h);
+		window.AWEngine.setHour(h);
 	}
 	switchLightHelper(v) {
-		window.WEngine.switchLightHelper(v);
+		window.AWEngine.switchLightHelper(v);
 	}
 	axisHelperVisibility(v) {
-		window.WEngine.showAxisHelper(v);
+		window.AWEngine.showAxisHelper(v);
 	}
 	enableClickMeasure(b) {
-		window.WEngine.enableClickMeasure(b);
+		window.AWEngine.enableClickMeasure(b);
 	}
 	showShadow(v) {
-		window.WEngine.view.showShadow(v);
+		window.AWEngine.view.showShadow(v);
 	}
 	enableTestBvhData(b) {
-		window.WEngine.currentFollow.userData.avatar.enableTestBvhData(b);
+		window.AWEngine.currentFollow.userData.avatar.enableTestBvhData(b);
 	}
 	mode(mode) {
 		console.log('mode==' + mode);
@@ -591,7 +591,7 @@ class WGui {
 	initUI_scenes() {
 		var sceneMap = {};
 		var sceneList = [];
-		var changeScene = function (v) { window.WEngine.scene.load(sceneMap[v]) };
+		var changeScene = function (v) { window.AWEngine.scene.load(sceneMap[v]) };
 		var defCName;
 		window.world.scenes.forEach(function (scene, id) {
 			sceneList.push(scene.cname);
@@ -612,13 +612,13 @@ class WGui {
 	}
 	initUI_Effect() {
 		var g = this.ui.add('group', { name: '特效', bg: 'rgba(120,80,80,0.8)' });
-		g.add('bool', { name: '描边效果', p: 70, h: 20, inh: 16, value: false }).onChange(function (b) { window.WEngine.view.enableOutlineEffect(b); });
+		g.add('bool', { name: '描边效果', p: 70, h: 20, inh: 16, value: false }).onChange(function (b) { window.AWEngine.view.enableOutlineEffect(b); });
 	}
 	initUI_Physics() {
 		var g = this.ui.add('group', { name: '物理引擎', bg: 'rgba(120,80,80,0.8)' });
-		g.add('bool', { name: '人物胶囊', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.WEngine.showHeroCapsule(v); });
-		g.add('bool', { name: '骨架', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.WEngine.showAmmoSkeleton(v); });
-		g.add('bool', { name: '信息', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.WEngine.showPhysicInfo(v); });
+		g.add('bool', { name: '人物胶囊', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.AWEngine.showHeroCapsule(v); });
+		g.add('bool', { name: '骨架', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.AWEngine.showAmmoSkeleton(v); });
+		g.add('bool', { name: '信息', p: 70, h: 20, inh: 16, value: false }).onChange(function (v) { window.AWEngine.showPhysicInfo(v); });
 	}
 
 	initUI_BVH() {
@@ -628,15 +628,15 @@ class WGui {
 			if (!c.value) {
 				c.value = true; c.update();
 			}
-			window.WEngine.currentFollow.userData.avatar.loadAndPlayBvhData(result, fname);
+			window.AWEngine.currentFollow.userData.avatar.loadAndPlayBvhData(result, fname);
 		});
-		g.add('slide', { name: 'speed', min: 0, max: 1.5, value: 1, precision: 2, fontColor: '#D4B87B', stype: 1, bColor: '#999' }).onChange(function (v) { window.WEngine.currentFollow.userData.avatar.setBvhPlaySpeed(v) });
+		g.add('slide', { name: 'speed', min: 0, max: 1.5, value: 1, precision: 2, fontColor: '#D4B87B', stype: 1, bColor: '#999' }).onChange(function (v) { window.AWEngine.currentFollow.userData.avatar.setBvhPlaySpeed(v) });
 	}
 
 	initUI_HOLO(ui) {
 		var g = this.ui.add('group', { name: '全息显示', bg: 'rgba(120,100,80,0.8)' });
-		var s4 = g.add('bool', { name: '开启四面', p: 70, h: 20, value: false }).onChange(function (b) { s3.value = false; s3.update(); window.WEngine.enableHoloEffect(b, 4); });
-		var s3 = g.add('bool', { name: '开启三面', p: 70, h: 20, value: false }).onChange(function (b) { s4.value = false; s4.update(); window.WEngine.enableHoloEffect(b, 3); });
+		var s4 = g.add('bool', { name: '开启四面', p: 70, h: 20, value: false }).onChange(function (b) { s3.value = false; s3.update(); window.AWEngine.enableHoloEffect(b, 4); });
+		var s3 = g.add('bool', { name: '开启三面', p: 70, h: 20, value: false }).onChange(function (b) { s4.value = false; s4.update(); window.AWEngine.enableHoloEffect(b, 3); });
 	}
 	reset() {
 		this.removeJoystick();
@@ -674,10 +674,10 @@ class WGui {
 			var temfun = function (curBtn) {
 				var btn = document.getElementById('btn' + curBtn);
 				u.bindEvt(btn, toBind.start, function () {
-					window.WEngine.user.keyboard.setKeyFromBtns({ key: curBtn, type: 'down' });
+					window.AWEngine.user.keyboard.setKeyFromBtns({ key: curBtn, type: 'down' });
 				});
 				u.bindEvt(btn, toBind.end, function () {
-					window.WEngine.user.keyboard.setKeyFromBtns({ key: curBtn, type: 'up' });
+					window.AWEngine.user.keyboard.setKeyFromBtns({ key: curBtn, type: 'up' });
 				});
 			}
 			while (i--) {
@@ -714,20 +714,20 @@ class WGui {
 	//-------------------------------------
 	joyMove(t) {
 		if (this.isFollow) {
-			window.WEngine.user.key[0] = t[0];
-			window.WEngine.user.key[1] = t[1];
+			window.AWEngine.user.key[0] = t[0];
+			window.AWEngine.user.key[1] = t[1];
 		} else {
-			window.WEngine.user.key[1] = -Math.sqrt(t[0] * t[0] + t[1] * t[1]);
+			window.AWEngine.user.key[1] = -Math.sqrt(t[0] * t[0] + t[1] * t[1]);
 			if (Math.abs(t[0]) > 0.5 || Math.abs(t[1]) > 0.5) {
-				window.WEngine.user.key[7] = 1;
+				window.AWEngine.user.key[7] = 1;
 			} else {
-				window.WEngine.user.key[7] = 0;
+				window.AWEngine.user.key[7] = 0;
 			}
-			if (t[0] != 0 && t[1] != 0 && window.WEngine.currentFollow) {
-				window.WEngine.options({
-					name: window.WEngine.currentFollow.name,
+			if (t[0] != 0 && t[1] != 0 && window.AWEngine.currentFollow) {
+				window.AWEngine.options({
+					name: window.AWEngine.currentFollow.name,
 					type: 'character',
-					angle: Math.atan2(t[0], t[1]) - window.WEngine.compassAngle - Math.Pi / 2
+					angle: Math.atan2(t[0], t[1]) - window.AWEngine.compassAngle - Math.Pi / 2
 				});
 			}
 		}

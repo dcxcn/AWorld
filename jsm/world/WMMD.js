@@ -117,7 +117,7 @@ var WMMD = function (pConfO) {
 	this.curActionName = null;
 	this.curFreezeActionName=null;
 	this.size = pConfO.size;	
-	this.addModel(window.WEngine.view.getModel(this.ename),pConfO);	
+	this.addModel(window.AWEngine.view.getModel(this.ename),pConfO);	
 	this.initActions(pConfO);
 	
 	this.ikSolver = this.createCCDIKSolver( this.model );
@@ -222,8 +222,8 @@ WMMD.prototype =  {
 		
 	},
 	getKey : function(){
-		if(window.WEngine.currentFollow && window.WEngine.currentFollow.userData.avatar == this){
-			return window.WEngine.user.keyboard.getKey();
+		if(window.AWEngine.currentFollow && window.AWEngine.currentFollow.userData.avatar == this){
+			return window.AWEngine.user.keyboard.getKey();
 		}else{
 			return  new Float32Array( 20 );
 		}
@@ -303,7 +303,7 @@ WMMD.prototype.addModel = function( model, options ){
 			var m2 = materials[ i ];
 			copyMaterialToon2Phong(m2,m);			
 			m.needsUpdate = true;
-			m.envMap = window.WEngine.view.getEnvmap();
+			m.envMap = window.AWEngine.view.getEnvmap();
 			array.push( m );
 		}
 		return array;
@@ -367,10 +367,10 @@ WMMD.prototype.addModel = function( model, options ){
 
 
 		if(b.name ==='左腕'){
-			b.matrixWorld.multiply( new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler().fromArray(window.WEngine.toRad([0,0,45]))))
+			b.matrixWorld.multiply( new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler().fromArray(window.AWEngine.toRad([0,0,45]))))
 		}
 		if(b.name ==='右腕'){
-			b.matrixWorld.multiply( new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler().fromArray(window.WEngine.toRad([0,0,-45]))))
+			b.matrixWorld.multiply( new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler().fromArray(window.AWEngine.toRad([0,0,-45]))))
 		}
 		this.tPose_idx[i] = b.matrixWorld.clone();
     }
@@ -441,10 +441,10 @@ WMMD.prototype.initActions = function (options){
 			var isVMD = false;
 			if(actions[i].refVMD){
 				isVMD = true;
-				mmdAnimation = window.WEngine.view.getMMDAnimation(actions[i],this.model);
+				mmdAnimation = window.AWEngine.view.getMMDAnimation(actions[i],this.model);
 			}else if(actions[i].refBVH){
 				isVMD = false;
-				var actionO = window.WEngine.getActionData(actions[i].refBVH);
+				var actionO = window.AWEngine.getActionData(actions[i].refBVH);
 				mmdAnimation = this.makeAnimation(actionO,actions[i].name,actions[i]);
 			}
 			if(mmdAnimation!=null)this.actions[actions[i].name] = this.mixer.clipAction(mmdAnimation);
@@ -969,14 +969,14 @@ WMMD.prototype.findBoneTrack = function( name, tracks, bvhType ){
 WMMD.prototype.addHelper = function (){
 
     this.helper = new SkeletonHelper( this.model );
-    window.WEngine.view.addVisual( this.helper );
+    window.AWEngine.view.addVisual( this.helper );
 
 };
 
 WMMD.prototype.removeHelper = function (){
 
 	if(this.helper!=null){
-		window.WEngine.view.removeVisual( this.helper );
+		window.AWEngine.view.removeVisual( this.helper );
 		this.helper = null;
 	}
 };

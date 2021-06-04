@@ -41,14 +41,14 @@ var WAnimal = function (pConfO) {
 	this.curActionName = null;
 	this.curFreezeActionName=null;
 	this.size = pConfO.size;
-	this.addModel(window.WEngine.view.getModel(pConfO.modelName),pConfO);
+	this.addModel(window.AWEngine.view.getModel(pConfO.modelName),pConfO);
 
 	this.damageUUIDS = [];
 	
 	if(pConfO.physicBody){
 		this.initPhysicSkeleton();
 	}
-	this.animations = window.WEngine.view.getAnimations(pConfO.modelName);
+	this.animations = window.AWEngine.view.getAnimations(pConfO.modelName);
 	this.initActions(pConfO)		
     this.isReady = true;
 
@@ -102,8 +102,8 @@ WAnimal.prototype =  {
 		this.curActionName = actionName;
 	},
 	getKey : function(){
-		if(window.WEngine.currentFollow && window.WEngine.currentFollow.userData.avatar == this){
-			return window.WEngine.user.keyboard.getKey();
+		if(window.AWEngine.currentFollow && window.AWEngine.currentFollow.userData.avatar == this){
+			return window.AWEngine.user.keyboard.getKey();
 		}else{
 			return  new Float32Array( 20 );
 		}
@@ -190,14 +190,14 @@ WAnimal.prototype.initActions = function (pConfO){
 WAnimal.prototype.addHelper = function (){
 
     this.helper = new SkeletonHelper( this.model );
-    window.WEngine.view.addVisual( this.helper );
+    window.AWEngine.view.addVisual( this.helper );
 
 };
 
 WAnimal.prototype.removeHelper = function (){
 
 	if(this.helper!=null){
-		window.WEngine.view.removeVisual( this.helper );
+		window.AWEngine.view.removeVisual( this.helper );
 		this.helper = null;
 	}
 };

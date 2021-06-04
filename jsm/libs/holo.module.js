@@ -529,7 +529,7 @@ HOLO.FourSidedDisplay.prototype = {
      * @param camera
      */
     render: function (scene, camera) {
-        this.cameraDistance = window.WEngine.view.cameraControls.getRadius();
+        this.cameraDistance = window.AWEngine.view.cameraControls.getRadius();
         this._setCameras(camera);
         this._setScissors(scene);
     },
@@ -669,7 +669,7 @@ HOLO.ThreeSidedDisplay = function (renderer) {
     };
 
     this.render = function (scene, camera) {
-        this.cameraDistance = window.WEngine.view.cameraControls.getRadius();
+        this.cameraDistance = window.AWEngine.view.cameraControls.getRadius();
         scene.updateMatrixWorld();
         this._setCameras(camera);
         this._setScissors(scene);

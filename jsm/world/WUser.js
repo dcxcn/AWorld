@@ -66,7 +66,7 @@ class WUser extends EventDispatcher {
 				// 设置按键状态为TRUE
 				_user.keyboard.pressed[_user.keyboard.keyCodes[event.keyCode]] = true;
 				if (_user.keyboard.pressed["ctrl"] && _user.keyboard.pressed["shift"] && _user.keyboard.pressed["d"]) {
-					window.WEngine.showDebugPanel(true);
+					window.AWEngine.showDebugPanel(true);
 					event.preventDefault();
 					return;
 				}
@@ -87,7 +87,7 @@ class WUser extends EventDispatcher {
 					case 32: key[6] = 1; break; // space
 					case 16: key[7] = 1; break; // shift
 
-					case 71: window.WEngine.sh_grid(); break; // G
+					case 71: window.AWEngine.sh_grid(); break; // G
 					case 72: key[9] = 1; break;//H
 				}
 				// 触法一般的 onKeyDown 事件
@@ -147,10 +147,10 @@ class WUser extends EventDispatcher {
 				} else if (cc == 'Play:down') {
 
 				} else if (cc == 'Play:up') {
-					if (window.WEngine.run) {
-						window.WEngine.play(false);
+					if (window.AWEngine.run) {
+						window.AWEngine.play(false);
 					} else {
-						window.WEngine.play(true);
+						window.AWEngine.play(true);
 					}
 				}
 				if (evt.type == 'down') {

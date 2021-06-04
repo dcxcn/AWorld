@@ -548,14 +548,14 @@
 				var updateLockState = function(threeObj,lockState){	
 					var hingeLimit=[0, 0, 0.9, 0.3, 0.1];				
 					if (lockState){
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:("doorRight"==threeObj.name)?[-80, -79]:[80, 81]
 						});
 						threeObj.userData.lock=false;
 					}else{
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:hingeLimit
@@ -563,8 +563,8 @@
 						threeObj.userData.lock=true;
 					}
 				};
-				var doorR = window.WEngine.byName("doorRight");
-				var doorL = window.WEngine.byName("doorLeft");
+				var doorR = window.AWEngine.byName("doorRight");
+				var doorL = window.AWEngine.byName("doorLeft");
 				o.userData = o.userData||{};
 				o.userData.lock = doorR.userData.lock && doorL.userData.lock;
 				updateLockState(doorR,o.userData.lock);
@@ -577,14 +577,14 @@
 				var updateLockState = function(threeObj,lockState){	
 					var hingeLimit=[0, 0, 0.9, 0.3, 0.1];				
 					if (lockState){
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:("doorRight"==threeObj.name)?[-80, -79]:[80, 81]
 						});
 						threeObj.userData.lock=false;
 					}else{
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:hingeLimit
@@ -592,7 +592,7 @@
 						threeObj.userData.lock=true;
 					}
 				};
-				var threeObj = window.WEngine.byName("doorRight");
+				var threeObj = window.AWEngine.byName("doorRight");
 				//var threeObj = o.parent;
 				updateLockState(threeObj,threeObj.userData.lock);
 			}
@@ -604,14 +604,14 @@
 					var hingeLimit=[0, 0, 0.9, 0.3, 0.1];		
 					//debugger;
 					if (lockState){
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:("doorRight"==threeObj.name)?[-80, -79]:[80, 81]
 						});
 						threeObj.userData.lock=false;
 					}else{
-						window.WEngine.options({
+						window.AWEngine.options({
 							name:'joint_hinge_'+threeObj.name,
 							type:'joint_hinge',
 							limit:hingeLimit
@@ -619,7 +619,7 @@
 						threeObj.userData.lock=true;
 					}
 				};
-				var threeObj = window.WEngine.byName("doorLeft");
+				var threeObj = window.AWEngine.byName("doorLeft");
 				//var threeObj = o.parent;
 				updateLockState(threeObj,threeObj.userData.lock);
 			}

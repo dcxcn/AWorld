@@ -55,7 +55,7 @@ window.world = window.world || {};
 window.world.scenes = window.world.scenes || {};
 
 
-class WorldEngine extends THREE.EventDispatcher {
+class WEngine extends THREE.EventDispatcher {
 
 
 	constructor(o) {
@@ -3457,8 +3457,4 @@ class WorldEngine extends THREE.EventDispatcher {
 	}
 
 }
-window.WEngine = new WorldEngine();
-var startButton = document.getElementById('startButton');
-startButton.addEventListener('click', function () {
-	window.WEngine.init({ rendererClearColor: window.WEngine.colors.white });
-});
+export { WEngine }

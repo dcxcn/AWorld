@@ -135,7 +135,7 @@ WAvatarPhySkeleton.prototype = {
 
 			if(type!=null){
 				this.phyBones.push(				
-				window.WEngine.add({   
+				window.AWEngine.add({   
 					type:type,
 					size:size, 
 					pos:p1.toArray(), 
@@ -229,7 +229,7 @@ WAvatarPhySkeleton.prototype = {
                 boneMatrix.multiplyMatrices( bone.matrixWorld, mtx );
                 pos.setFromMatrixPosition( boneMatrix );
                 quat.setFromRotationMatrix( boneMatrix );
-				window.WEngine.options({
+				window.AWEngine.options({
 					name: bone.ammobodyName,
 					type: 'Rigid',
 					flag:2,

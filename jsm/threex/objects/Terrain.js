@@ -92,7 +92,7 @@ class Terrain extends Mesh {
 		//this.geometry.setAttribute( 'uv2', this.geometry.attributes.uv );
 		this.vertices = this.geometry.attributes.position.array;
 
-		this.waterNormal = this.isWater ? window.WEngine.three.texture({ url:'terrain/water_n.jpg',name:'water_n',repeat:[ o.uv || 3, o.uv || 3 ]}) : null;
+		this.waterNormal = this.isWater ? window.AWEngine.three.texture({ url:'terrain/water_n.jpg',name:'water_n',repeat:[ o.uv || 3, o.uv || 3 ]}) : null;
 		this.hasHeightMap = o.heightMapUrl?true:false;
 		this.heightMapUrl = o.heightMapUrl;
 		var materialData = { 
@@ -129,7 +129,7 @@ class Terrain extends Mesh {
 			for( var i in this.maps ){
 
 				name = this.maps[i];
-				txt[name] = window.WEngine.view.texture({ url:'terrain/'+name+'.jpg',name:name, repeat:this.uvx});
+				txt[name] = window.AWEngine.view.texture({ url:'terrain/'+name+'.jpg',name:name, repeat:this.uvx});
 
 			}
 
@@ -234,7 +234,7 @@ class Terrain extends Mesh {
 
 		//this.uniforms = uniforms;
 
-		this.material = window.WEngine.view.material( materialData );
+		this.material = window.AWEngine.view.material( materialData );
 
 
 		if( this.wantBorder ) this.addBorder( o );
@@ -266,7 +266,7 @@ class Terrain extends Mesh {
 	
 	addBorder  ( o ){
 
-    	this.borderMaterial = window.WEngine.view.material({ 
+    	this.borderMaterial = window.AWEngine.view.material({ 
 
     		vertexColors: VertexColors, 
     		metalness: this.isWater ? 0.8 : 0.4, 
@@ -558,7 +558,7 @@ class Terrain extends Mesh {
         }
 		var txtLoader = new TextureLoader();
 		var _self = this;
-		window.WEngine.view.texture({url:_self.heightMapUrl,name:_self.name+'_hmap',onLoad:function(heightTexture){
+		window.AWEngine.view.texture({url:_self.heightMapUrl,name:_self.name+'_hmap',onLoad:function(heightTexture){
 			var image = heightTexture.image;
 			var canvas = document.createElement('canvas');
 			canvas.width = image.width;

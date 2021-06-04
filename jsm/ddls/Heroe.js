@@ -45,7 +45,7 @@ Heroe.prototype = {
 		   var prevPoint = new Vector3(this.mesh.position.x,this.mesh.position.y,this.mesh.position.z);
 		   forward.subVectors( point, prevPoint ).normalize();
 		   var angle = Math.atan2( forward.x, forward.z );
-		   window.WEngine.options({
+		   window.AWEngine.options({
 			   name:this.mesh.name,
 			   type:'character',
                angle:angle,

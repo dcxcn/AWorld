@@ -111,7 +111,7 @@ WMMDPhySkeleton.prototype = {
 					o.kinematic = true;
 					o.neverSleep = true;
 				} 
-				var ammoBody = window.WEngine.physic.add(o);
+				var ammoBody = window.AWEngine.physic.add(o);
 				offsetMtx.identity();				
 				offsetMtx.makeTranslation(mmdPos[0], mmdPos[1], mmdPos[2]);
 				offsetMtx.makeRotationFromQuaternion(tmpQ);
@@ -126,7 +126,7 @@ WMMDPhySkeleton.prototype = {
 		console.log(this.wmmd.ename+'--ammoBodies.length-'+this.ammoBodies.length);
 	},
 	initConstraints_test:function(){
-		var _physic = window.WEngine.physic;
+		var _physic = window.AWEngine.physic;
 		var num = 20;
 		var mid = (num * 0.21) * 0.5;
 		var py = 0.2;
@@ -185,7 +185,7 @@ WMMDPhySkeleton.prototype = {
 			console.log('p--'+cParams.position[0]*scale+' '+cParams.position[1]*scale+' '+cParams.position[2]*scale);
 			q = tmpQ.setFromEuler( tmpE.fromArray( cParams.rotation )).toArray();
 			//debugger;
-			window.WEngine.physic.add({ 
+			window.AWEngine.physic.add({ 
 				type: 'joint_spring_dof', 
 				name: 'joint_'+ammoBodyA.name+'_'+ammoBodyB.name, 
 				b1: ammoBodyA.name, 
@@ -203,7 +203,7 @@ WMMDPhySkeleton.prototype = {
 				collision: false,
 				local: false
 			});
-			window.WEngine.physic.options({
+			window.AWEngine.physic.options({
 				name: ammoBodyB.name,
 				type: 'body',
 				flag: 0
@@ -262,7 +262,7 @@ WMMDPhySkeleton.prototype = {
 			console.log('2==name=='+bone.name);
 			bone.matrixWorld.decompose( p, q, s );
 			//console.log(i+'==updateRigidBodies=='+ammoBody.name);
-			window.WEngine.physic.options({
+			window.AWEngine.physic.options({
 				name: ammoBody.name,
 				type: 'body',
 				mmdPos: ammoBody.mmdData.p,
@@ -287,7 +287,7 @@ WMMDPhySkeleton.prototype = {
 				//console.log(i+'==name=='+bone.name);
 				bone.matrixWorld.decompose( p, q, s );
 				//console.log(i+'==updateRigidBodies=='+ammoBody.name);
-				window.WEngine.physic.options({
+				window.AWEngine.physic.options({
 					name: ammoBody.name,
 					type: 'body',
 					mmdPos: ammoBody.mmdData.p,
@@ -316,7 +316,7 @@ WMMDPhySkeleton.prototype = {
 			}
 
 			//console.log(i+'==updateRigidBodies=='+ammoBody.name);
-			window.WEngine.options({
+			window.AWEngine.options({
 				name: ammoBody.name,
 				type: 'body',				
 				mmdPos: ammoBody.mmdData.p,
