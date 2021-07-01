@@ -76,8 +76,8 @@
 	},{
 		type: 'custom',
 		customFunc: function(){
-			var _view = WEngine.view;
-			var _physic = WEngine.physic;
+			var _view = AWEngine.view;
+			var _physic = AWEngine.physic;
 			var mat = _view.material({ name:'mobil',
 				color:0xcbad7b,
 				roughness: 0.4,

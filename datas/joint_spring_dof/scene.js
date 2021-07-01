@@ -37,7 +37,7 @@
 	},{
 		type: 'custom',
 		customFunc: function(){
-			var _physic = WEngine.physic;
+			var _physic = AWEngine.physic;
 			var num = 20;
 			var mid = (num * 2.1) * 0.5;
 			var py = 20;

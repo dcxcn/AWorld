@@ -26,14 +26,14 @@
 		vertexShaderSrc:"vs.glsl",
 		fragmentShaderSrc:"fs.glsl",
 		loop:function(delta){
-			var uniforms1 = WEngine.getShaderUnforms("wavecolor1");
+			var uniforms1 = AWEngine.getShaderUnforms("wavecolor1");
 			uniforms1.iTime.value += delta * 5;
 		},
 		debugParams:[{name:"iTime",min:0,max:10,step:0.01,value:5,f:function(val){
-			var uniforms1 = WEngine.getShaderUnforms("wavecolor1");
+			var uniforms1 = AWEngine.getShaderUnforms("wavecolor1");
 			uniforms1.iTime.value = val;
 		}},{name:"lineCount",min:1,max:10,step:1,value:3,f:function(val){
-			var uniforms1 = WEngine.getShaderUnforms("wavecolor1");
+			var uniforms1 = AWEngine.getShaderUnforms("wavecolor1");
 			uniforms1.lineCount.value = val;
 		}}
 		]

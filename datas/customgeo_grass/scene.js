@@ -23,14 +23,14 @@
 		vertexShaderSrc:"vs.glsl",
 		fragmentShaderSrc:"fs.glsl",
 		loop:function(delta){
-			var uniforms1 = WEngine.getShaderUnforms("rs_grass");
+			var uniforms1 = AWEngine.getShaderUnforms("rs_grass");
 			uniforms1.time.value += 1 / 100;
 		},
 		debugParams:[{name:"time",min:0,max:10,value:5,f:function(val){
-			var uniforms1 = WEngine.getShaderUnforms("rs_grass");
+			var uniforms1 = AWEngine.getShaderUnforms("rs_grass");
 			uniforms1.time.value = val;
 		}},{name:"blade_h",min:0.1,max:3,value:1,f:function(val){
-			var uniforms1 = WEngine.getShaderUnforms("rs_grass");
+			var uniforms1 = AWEngine.getShaderUnforms("rs_grass");
 			uniforms1.blade_h.value = val;
 		}}
 		]
@@ -150,9 +150,9 @@
 			instanced_geometry.setAttribute('stretch', stretchAttribute);
 			instanced_geometry.setAttribute('halfRootAngleSin', halfRootAngleSinAttribute);
 			instanced_geometry.setAttribute('halfRootAngleCos', halfRootAngleCosAttribute);
-			var mat = WEngine.view.getMaterial("rs_grass");
+			var mat = AWEngine.view.getMaterial("rs_grass");
 			var mesh = new THREE.Mesh(instanced_geometry, mat);
-			WEngine.view.addVisual(mesh);		
+			AWEngine.view.addVisual(mesh);		
 
 		}
 		

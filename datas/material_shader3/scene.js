@@ -22,11 +22,11 @@
 		"	gl_FragColor = vec4( red, green, blue, 1.0 ); "+
 		"} ",
 		loop:function(delta){
-			//var uniforms1 = WEngine.getShaderUnforms("custom1");
+			//var uniforms1 = AWEngine.getShaderUnforms("custom1");
 			//uniforms1.time.value += delta * 5;
 		},
 		debugParams:[{name:"time",min:0,max:10,step:0.01,value:5,f:function(val){
-			var uniforms1 = WEngine.getShaderUnforms("custom1");
+			var uniforms1 = AWEngine.getShaderUnforms("custom1");
 			uniforms1.time.value = val;
 		}}
 		]

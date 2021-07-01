@@ -79,8 +79,8 @@
 	},{
 		type: 'custom',
 		customFunc: function(){
-			var _view = WEngine.view;
-			var _physic = WEngine.physic;
+			var _view = AWEngine.view;
+			var _physic = AWEngine.physic;
 			var ballMat = _view.material({
 				name:'bball',
 				roughness: 0.4,
@@ -89,7 +89,7 @@
 				normalMap: { url: 'bball/bball_n.jpg', repeat:[2,1], flip:false },
 			});
 			
-			var ball = WEngine.add({ type:'highsphere', name:'ball', size:[5], pos:[0,10,-25], mass:2, friction:0.5, material:ballMat });
+			var ball = AWEngine.add({ type:'highsphere', name:'ball', size:[5], pos:[0,10,-25], mass:2, friction:0.5, material:ballMat });
 
 			var i = 20;
 			while(i--){

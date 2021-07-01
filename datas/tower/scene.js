@@ -114,7 +114,7 @@
 	},{
 		type: 'box',
 		conFunc: function(){
-			var _view = WEngine.view;
+			var _view = AWEngine.view;
 			var glass = _view.material({
 				name:'glass',
 				color: 0x3366ff,
