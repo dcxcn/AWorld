@@ -3422,7 +3422,7 @@ class WEngine extends THREE.EventDispatcher {
 		var _self = this;
 		this.physic.init(function () {
 			_self.physic.setView(_self.view);
-			_self.view.unPause = function () { _physic.start() };
+			_self.view.unPause = function () { _self.physic.start() };
 			_self.physic.tell = function () {
 
 				if (_self.showPhyinfo) {
