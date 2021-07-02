@@ -2481,13 +2481,8 @@ class WEngine extends THREE.EventDispatcher {
 		}
 	}
 	switchLightHelper(v) {
-		for (var i = 0; i != lightHelpers.length; i++) {
-			lightHelpers[i].visible = v;
-		}
-	}
-	switchLightHelper(v) {
-		for (var i = 0; i != lightHelpers.length; i++) {
-			lightHelpers[i].visible = v;
+		for (var i = 0; i != this.lightHelpers.length; i++) {
+			this.lightHelpers[i].visible = v;
 		}
 	}
 	//创建光源

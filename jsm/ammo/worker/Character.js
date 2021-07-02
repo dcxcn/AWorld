@@ -157,7 +157,7 @@ Object.assign( Hero.prototype, {
 		//btScalar walkSpeed = walkVelocity * dt;
 
 		var walkSpeed = 0.05,jumpUpSpeed=0.04;
-		var angleInc = 0.1;
+		var angleInc = 0.03;
 
 		var x = 0, y = 0, z = 0;
 
